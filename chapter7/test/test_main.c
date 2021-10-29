@@ -21,6 +21,8 @@ int main() {
 
   // VM_Math
   RUN_TEST(test_opcode_loadi);
+  RUN_TEST(test_opcode_loadineg);
+  RUN_TEST(test_opcode_loadi__1);
 
   return UNITY_END();
 }

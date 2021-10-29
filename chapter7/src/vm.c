@@ -49,8 +49,28 @@ LOAD_I:
         reg[a] = insn - OP_LOADI_0;
         NEXT;
       }
+      CASE(OP_ADD, B) {
+        reg[a] += reg[a + 1];
+        NEXT;
+      }
       CASE(OP_ADDI, BB) {
         reg[a] += b;
+        NEXT;
+      }
+      CASE(OP_SUB, B) {
+        reg[a] -= reg[a + 1];
+        NEXT;
+      }
+      CASE(OP_SUBI, BB) {
+        reg[a] -= b;
+        NEXT;
+      }
+      CASE(OP_MUL, B) {
+        reg[a] *= reg[a + 1];
+        NEXT;
+      }
+      CASE(OP_DIV, B) {
+        reg[a] /= reg[a + 1];
         NEXT;
       }
       CASE(OP_RETURN, B) {

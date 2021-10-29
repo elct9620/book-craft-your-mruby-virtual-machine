@@ -23,6 +23,12 @@ int main() {
   RUN_TEST(test_opcode_loadi);
   RUN_TEST(test_opcode_loadineg);
   RUN_TEST(test_opcode_loadi__1);
+  RUN_TEST(test_opcode_add);
+  RUN_TEST(test_opcode_addi);
+  RUN_TEST(test_opcode_sub);
+  RUN_TEST(test_opcode_subi);
+  RUN_TEST(test_opcode_mul);
+  RUN_TEST(test_opcode_div);
 
   return UNITY_END();
 }

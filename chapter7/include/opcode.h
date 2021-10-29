@@ -27,7 +27,10 @@
 
 enum {
   OP_NOP,
-  OP_LOADI_0 = 6,
+  OP_LOADI = 3,
+  OP_LOADINEG,
+  OP_LOADI__1,
+  OP_LOADI_0,
   OP_LOADI_1,
   OP_LOADI_2,
   OP_LOADI_3,
@@ -36,7 +39,12 @@ enum {
   OP_LOADI_6,
   OP_LOADI_7,
   OP_RETURN = 55,
-  OP_ADDI = 60,
+  OP_ADD = 59,
+  OP_ADDI,
+  OP_SUB,
+  OP_SUBI,
+  OP_MUL,
+  OP_DIV,
 };
 
 #endif

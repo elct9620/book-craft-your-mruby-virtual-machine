@@ -3,6 +3,7 @@
 #include "test_utils.h"
 #include "test_irep.h"
 #include "test_vm.h"
+#include "test_math.h"
 
 int main() {
   UNITY_BEGIN();
@@ -17,6 +18,9 @@ int main() {
 
   // VM
   RUN_TEST(test_mrb_exec);
+
+  // VM_Math
+  RUN_TEST(test_opcode_loadi);
 
   return UNITY_END();
 }

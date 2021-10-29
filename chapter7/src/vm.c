@@ -28,6 +28,10 @@ int mrb_exec(const uint8_t* bin) {
       CASE(OP_NOP, Z) {
         NEXT;
       }
+      CASE(OP_LOADI, BB) {
+        reg[a] = b;
+        NEXT;
+      }
       CASE(OP_LOADI_0, B) goto LOAD_I;
       CASE(OP_LOADI_1, B) goto LOAD_I;
       CASE(OP_LOADI_2, B) goto LOAD_I;

@@ -49,6 +49,9 @@ LOAD_I:
         reg[a] = insn - OP_LOADI_0;
         NEXT;
       }
+      CASE(OP_RETURN, B) {
+        return reg[a];
+      }
       CASE(OP_ADD, B) {
         reg[a] += reg[a + 1];
         NEXT;
@@ -73,8 +76,25 @@ LOAD_I:
         reg[a] /= reg[a + 1];
         NEXT;
       }
-      CASE(OP_RETURN, B) {
-        return reg[a];
+      CASE(OP_EQ, B) {
+        reg[a] = reg[a] == reg[a + 1];
+        NEXT;
+      }
+      CASE(OP_LT, B) {
+        reg[a] = reg[a] < reg[a + 1];
+        NEXT;
+      }
+      CASE(OP_LE, B) {
+        reg[a] = reg[a] <= reg[a + 1];
+        NEXT;
+      }
+      CASE(OP_GT, B) {
+        reg[a] = reg[a] > reg[a + 1];
+        NEXT;
+      }
+      CASE(OP_GE, B) {
+        reg[a] = reg[a] >= reg[a + 1];
+        NEXT;
       }
     }
   }

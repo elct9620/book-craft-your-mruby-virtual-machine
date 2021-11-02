@@ -1,2 +1,4 @@
 *.mrb
 .vscode
+example.rb
+example.c

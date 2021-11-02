@@ -45,6 +45,11 @@ enum {
   OP_SUBI,
   OP_MUL,
   OP_DIV,
+  OP_EQ,
+  OP_LT,
+  OP_LE,
+  OP_GT,
+  OP_GE,
 };
 
 #endif

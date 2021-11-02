@@ -1,7 +1,7 @@
 #include<vm.h>
 #include<opcode.h>
 
-int mrb_exec(const uint8_t* bin) {
+mrb_value mrb_exec(const uint8_t* bin) {
   const uint8_t* p = bin;
   uint8_t len;
 
@@ -18,7 +18,7 @@ int mrb_exec(const uint8_t* bin) {
   int32_t a = 0;
   int32_t b = 0;
   int32_t c = 0;
-  intptr_t reg[irep->nregs];
+  mrb_value reg[irep->nregs];
 
 
   for(;;) {
@@ -29,11 +29,11 @@ int mrb_exec(const uint8_t* bin) {
         NEXT;
       }
       CASE(OP_LOADI, BB) {
-        reg[a] = b;
+        reg[a] = mrb_fixnum_value(b);
         NEXT;
       }
       CASE(OP_LOADINEG, BB) {
-        reg[a] = b * -1;
+        reg[a] = mrb_fixnum_value(b * -1);
         NEXT;
       }
       CASE(OP_LOADI__1, B) goto LOAD_I;
@@ -46,58 +46,60 @@ int mrb_exec(const uint8_t* bin) {
       CASE(OP_LOADI_6, B) goto LOAD_I;
       CASE(OP_LOADI_7, B) {
 LOAD_I:
-        reg[a] = insn - OP_LOADI_0;
+        reg[a] = mrb_fixnum_value(insn - OP_LOADI_0);
         NEXT;
       }
       CASE(OP_RETURN, B) {
         return reg[a];
       }
       CASE(OP_ADD, B) {
-        reg[a] += reg[a + 1];
+        reg[a] = mrb_fixnum_value(reg[a].value.i + reg[a + 1].value.i);
         NEXT;
       }
       CASE(OP_ADDI, BB) {
-        reg[a] += b;
+        reg[a] = mrb_fixnum_value(reg[a].value.i + b);
         NEXT;
       }
       CASE(OP_SUB, B) {
-        reg[a] -= reg[a + 1];
+        reg[a] = mrb_fixnum_value(reg[a].value.i - reg[a + 1].value.i);
         NEXT;
       }
       CASE(OP_SUBI, BB) {
-        reg[a] -= b;
+        reg[a] = mrb_fixnum_value(reg[a].value.i - b);
         NEXT;
       }
       CASE(OP_MUL, B) {
-        reg[a] *= reg[a + 1];
+        reg[a] = mrb_fixnum_value(reg[a].value.i * reg[a + 1].value.i);
         NEXT;
       }
       CASE(OP_DIV, B) {
-        reg[a] /= reg[a + 1];
+        reg[a] = mrb_fixnum_value(reg[a].value.i / reg[a + 1].value.i);
         NEXT;
       }
       CASE(OP_EQ, B) {
-        reg[a] = reg[a] == reg[a + 1];
+        reg[a] = mrb_fixnum_value(reg[a].value.i == reg[a + 1].value.i);
         NEXT;
       }
       CASE(OP_LT, B) {
-        reg[a] = reg[a] < reg[a + 1];
+        reg[a] = mrb_fixnum_value(reg[a].value.i < reg[a + 1].value.i);
         NEXT;
       }
       CASE(OP_LE, B) {
-        reg[a] = reg[a] <= reg[a + 1];
+        reg[a] = mrb_fixnum_value(reg[a].value.i <= reg[a + 1].value.i);
         NEXT;
       }
       CASE(OP_GT, B) {
-        reg[a] = reg[a] > reg[a + 1];
+        reg[a] = mrb_fixnum_value(reg[a].value.i > reg[a + 1].value.i);
         NEXT;
       }
       CASE(OP_GE, B) {
-        reg[a] = reg[a] >= reg[a + 1];
+        reg[a] = mrb_fixnum_value(reg[a].value.i >= reg[a + 1].value.i);
         NEXT;
       }
     }
   }
 
-  return 0;
+  // TODO: Next refactor to return nil
+  mrb_value v;
+  return v;
 }

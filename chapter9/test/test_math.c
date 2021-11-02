@@ -13,9 +13,9 @@ void test_opcode_loadi() {
     0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  int ret = mrb_exec(bin + 34);
+  mrb_value ret = mrb_exec(bin + 34);
 
-  TEST_ASSERT_EQUAL_UINT32(99, ret);
+  TEST_ASSERT_EQUAL_UINT32(99, ret.value.i);
 }
 
 void test_opcode_loadineg() {
@@ -31,9 +31,9 @@ void test_opcode_loadineg() {
     0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  int ret = mrb_exec(bin + 34);
+  mrb_value ret = mrb_exec(bin + 34);
 
-  TEST_ASSERT_EQUAL_UINT32(-101, ret);
+  TEST_ASSERT_EQUAL_UINT32(-101, ret.value.i);
 }
 
 void test_opcode_loadi__1() {
@@ -49,9 +49,9 @@ void test_opcode_loadi__1() {
     0x00,0x00,0x00,0x00,0x08,
   };
 
-  int ret = mrb_exec(bin + 34);
+  mrb_value ret = mrb_exec(bin + 34);
 
-  TEST_ASSERT_EQUAL_UINT32(-1, ret);
+  TEST_ASSERT_EQUAL_UINT32(-1, ret.value.i);
 }
 
 void test_opcode_add() {
@@ -67,9 +67,9 @@ void test_opcode_add() {
     0x45,0x4e,0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  int ret = mrb_exec(bin + 34);
+  mrb_value ret = mrb_exec(bin + 34);
 
-  TEST_ASSERT_EQUAL_UINT32(101, ret);
+  TEST_ASSERT_EQUAL_UINT32(101, ret.value.i);
 }
 
 void test_opcode_addi() {
@@ -85,9 +85,9 @@ void test_opcode_addi() {
     0x00,0x45,0x4e,0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  int ret = mrb_exec(bin + 34);
+  mrb_value ret = mrb_exec(bin + 34);
 
-  TEST_ASSERT_EQUAL_UINT32(102, ret);
+  TEST_ASSERT_EQUAL_UINT32(102, ret.value.i);
 }
 
 void test_opcode_sub() {
@@ -103,9 +103,9 @@ void test_opcode_sub() {
     0x00,0x45,0x4e,0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  int ret = mrb_exec(bin + 34);
+  mrb_value ret = mrb_exec(bin + 34);
 
-  TEST_ASSERT_EQUAL_UINT32(1, ret);
+  TEST_ASSERT_EQUAL_UINT32(1, ret.value.i);
 }
 
 void test_opcode_subi() {
@@ -121,9 +121,9 @@ void test_opcode_subi() {
     0x00,0x45,0x4e,0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  int ret = mrb_exec(bin + 34);
+  mrb_value ret = mrb_exec(bin + 34);
 
-  TEST_ASSERT_EQUAL_UINT32(99, ret);
+  TEST_ASSERT_EQUAL_UINT32(99, ret.value.i);
 }
 
 void test_opcode_mul() {
@@ -139,9 +139,9 @@ void test_opcode_mul() {
     0x00,0x00,0x00,0x45,0x4e,0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  int ret = mrb_exec(bin + 34);
+  mrb_value ret = mrb_exec(bin + 34);
 
-  TEST_ASSERT_EQUAL_UINT32(100, ret);
+  TEST_ASSERT_EQUAL_UINT32(100, ret.value.i);
 }
 
 void test_opcode_div() {
@@ -157,7 +157,7 @@ void test_opcode_div() {
     0x00,0x00,0x45,0x4e,0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  int ret = mrb_exec(bin + 34);
+  mrb_value ret = mrb_exec(bin + 34);
 
-  TEST_ASSERT_EQUAL_UINT32(3, ret);
+  TEST_ASSERT_EQUAL_UINT32(3, ret.value.i);
 }

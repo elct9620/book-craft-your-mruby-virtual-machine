@@ -10,7 +10,7 @@ void test_mrb_exec() {
     0x45,0x4e,0x44,0x00,0x00,0x00,0x00,0x08
   };
 
-  int ret = mrb_exec(bin + 34);
+  mrb_value ret = mrb_exec(bin + 34);
 
-  TEST_ASSERT_EQUAL_UINT32(2, ret);
+  TEST_ASSERT_EQUAL_UINT32(2, ret.value.i);
 }

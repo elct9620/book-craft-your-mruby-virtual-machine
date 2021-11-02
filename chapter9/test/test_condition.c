@@ -8,9 +8,9 @@ void test_opcode_eq() {
      */
   };
 
-  int ret = mrb_exec(bin + 34);
+  mrb_value ret = mrb_exec(bin + 34);
 
-  TEST_ASSERT_EQUAL_UINT32(1, ret);
+  TEST_ASSERT_EQUAL_UINT32(1, ret.value.i);
 }
 
 void test_opcode_lt() {
@@ -21,9 +21,9 @@ void test_opcode_lt() {
      */
   };
 
-  int ret = mrb_exec(bin + 34);
+  mrb_value ret = mrb_exec(bin + 34);
 
-  TEST_ASSERT_EQUAL_UINT32(0, ret);
+  TEST_ASSERT_EQUAL_UINT32(0, ret.value.i);
 }
 void test_opcode_le() {
   const uint8_t bin[] = {
@@ -33,9 +33,9 @@ void test_opcode_le() {
      */
   };
 
-  int ret = mrb_exec(bin + 34);
+  mrb_value ret = mrb_exec(bin + 34);
 
-  TEST_ASSERT_EQUAL_UINT32(1, ret);
+  TEST_ASSERT_EQUAL_UINT32(1, ret.value.i);
 }
 void test_opcode_gt() {
   const uint8_t bin[] = {
@@ -45,9 +45,9 @@ void test_opcode_gt() {
      */
   };
 
-  int ret = mrb_exec(bin + 34);
+  mrb_value ret = mrb_exec(bin + 34);
 
-  TEST_ASSERT_EQUAL_UINT32(1, ret);
+  TEST_ASSERT_EQUAL_UINT32(1, ret.value.i);
 }
 void test_opcode_ge() {
   const uint8_t bin[] = {
@@ -57,8 +57,8 @@ void test_opcode_ge() {
      */
   };
 
-  int ret = mrb_exec(bin + 34);
+  mrb_value ret = mrb_exec(bin + 34);
 
-  TEST_ASSERT_EQUAL_UINT32(0, ret);
+  TEST_ASSERT_EQUAL_UINT32(0, ret.value.i);
 }
 

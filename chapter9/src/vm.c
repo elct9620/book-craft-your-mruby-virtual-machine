@@ -29,11 +29,11 @@ mrb_value mrb_exec(const uint8_t* bin) {
         NEXT;
       }
       CASE(OP_LOADI, BB) {
-        reg[a] = mrb_fixnum_value(b);
+        SET_INT_VALUE(reg[a], b);
         NEXT;
       }
       CASE(OP_LOADINEG, BB) {
-        reg[a] = mrb_fixnum_value(b * -1);
+        SET_INT_VALUE(reg[a], b * -1);
         NEXT;
       }
       CASE(OP_LOADI__1, B) goto LOAD_I;
@@ -46,54 +46,74 @@ mrb_value mrb_exec(const uint8_t* bin) {
       CASE(OP_LOADI_6, B) goto LOAD_I;
       CASE(OP_LOADI_7, B) {
 LOAD_I:
-        reg[a] = mrb_fixnum_value(insn - OP_LOADI_0);
+        SET_INT_VALUE(reg[a], insn - OP_LOADI_0);
         NEXT;
       }
       CASE(OP_RETURN, B) {
         return reg[a];
       }
       CASE(OP_ADD, B) {
-        reg[a] = mrb_fixnum_value(reg[a].value.i + reg[a + 1].value.i);
+        SET_INT_VALUE(reg[a], mrb_int(reg[a]) + mrb_int(reg[a + 1]));
         NEXT;
       }
       CASE(OP_ADDI, BB) {
-        reg[a] = mrb_fixnum_value(reg[a].value.i + b);
+        SET_INT_VALUE(reg[a], mrb_int(reg[a]) + b);
         NEXT;
       }
       CASE(OP_SUB, B) {
-        reg[a] = mrb_fixnum_value(reg[a].value.i - reg[a + 1].value.i);
+        SET_INT_VALUE(reg[a], mrb_int(reg[a]) - mrb_int(reg[a + 1]));
         NEXT;
       }
       CASE(OP_SUBI, BB) {
-        reg[a] = mrb_fixnum_value(reg[a].value.i - b);
+        SET_INT_VALUE(reg[a], mrb_int(reg[a]) - b);
         NEXT;
       }
       CASE(OP_MUL, B) {
-        reg[a] = mrb_fixnum_value(reg[a].value.i * reg[a + 1].value.i);
+        SET_INT_VALUE(reg[a], mrb_int(reg[a]) * mrb_int(reg[a + 1]));
         NEXT;
       }
       CASE(OP_DIV, B) {
-        reg[a] = mrb_fixnum_value(reg[a].value.i / reg[a + 1].value.i);
+        SET_INT_VALUE(reg[a], mrb_int(reg[a]) / mrb_int(reg[a + 1]));
         NEXT;
       }
       CASE(OP_EQ, B) {
-        reg[a] = mrb_fixnum_value(reg[a].value.i == reg[a + 1].value.i);
+        if(mrb_int(reg[a]) == mrb_int(reg[a + 1])) {
+          SET_TRUE_VALUE(reg[a]);
+        } else {
+          SET_FALSE_VALUE(reg[a]);
+        }
         NEXT;
       }
       CASE(OP_LT, B) {
-        reg[a] = mrb_fixnum_value(reg[a].value.i < reg[a + 1].value.i);
+        if(mrb_int(reg[a]) < mrb_int(reg[a + 1])) {
+          SET_TRUE_VALUE(reg[a]);
+        } else {
+          SET_FALSE_VALUE(reg[a]);
+        }
         NEXT;
       }
       CASE(OP_LE, B) {
-        reg[a] = mrb_fixnum_value(reg[a].value.i <= reg[a + 1].value.i);
+        if(mrb_int(reg[a]) <= mrb_int(reg[a + 1])) {
+          SET_TRUE_VALUE(reg[a]);
+        } else {
+          SET_FALSE_VALUE(reg[a]);
+        }
         NEXT;
       }
       CASE(OP_GT, B) {
-        reg[a] = mrb_fixnum_value(reg[a].value.i > reg[a + 1].value.i);
+        if(mrb_int(reg[a]) > mrb_int(reg[a + 1])) {
+          SET_TRUE_VALUE(reg[a]);
+        } else {
+          SET_FALSE_VALUE(reg[a]);
+        }
         NEXT;
       }
       CASE(OP_GE, B) {
-        reg[a] = mrb_fixnum_value(reg[a].value.i >= reg[a + 1].value.i);
+        if(mrb_int(reg[a]) >= mrb_int(reg[a + 1])) {
+          SET_TRUE_VALUE(reg[a]);
+        } else {
+          SET_FALSE_VALUE(reg[a]);
+        }
         NEXT;
       }
     }

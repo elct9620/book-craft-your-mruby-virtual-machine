@@ -4,6 +4,7 @@
 #include "test_irep.h"
 #include "test_vm.h"
 #include "test_math.h"
+#include "test_condition.h"
 
 int main() {
   UNITY_BEGIN();
@@ -29,6 +30,13 @@ int main() {
   RUN_TEST(test_opcode_subi);
   RUN_TEST(test_opcode_mul);
   RUN_TEST(test_opcode_div);
+
+  // VM_Condition
+  RUN_TEST(test_opcode_eq);
+  RUN_TEST(test_opcode_lt);
+  RUN_TEST(test_opcode_le);
+  RUN_TEST(test_opcode_gt);
+  RUN_TEST(test_opcode_ge);
 
   return UNITY_END();
 }

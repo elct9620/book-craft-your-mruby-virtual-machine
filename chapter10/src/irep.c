@@ -1,23 +1,17 @@
 #include<irep.h>
+#include<opcode.h>
 
-irep_header* irep_read_header(const uint8_t* ptr, uint8_t* len) {
-  const uint8_t* start = ptr;
+irep_header* irep_read_header(const uint8_t* p, uint8_t* len) {
+  const uint8_t* start = p;
 
   irep_header* header = (irep_header*)malloc(sizeof(irep_header));
 
-  header->size = bin_to_uint32(ptr);
-  ptr += 4;
+  header->size = READ_L();
+  header->nlocals = READ_S();
+  header->nregs = READ_S();
+  header->nirep = READ_S();
 
-  header->nlocals = bin_to_uint16(ptr);
-  ptr += 2;
-
-  header->nregs = bin_to_uint16(ptr);
-  ptr += 2;
-
-  header->nirep = bin_to_uint16(ptr);
-  ptr += 2;
-
-  *len = (uint8_t)(ptr - start);
+  *len = (uint8_t)(p - start);
 
   return header;
 }

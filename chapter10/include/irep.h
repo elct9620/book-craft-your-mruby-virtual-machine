@@ -3,7 +3,6 @@
 
 #include<stdint.h>
 #include<stdlib.h>
-#include "utils.h"
 
 typedef struct irep_header {
   uint32_t size;

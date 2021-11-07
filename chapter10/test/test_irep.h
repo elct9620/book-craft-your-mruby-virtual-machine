@@ -5,5 +5,7 @@
 #include<irep.h>
 
 void test_irep_read_header();
+void test_irep_get_literal();
+void test_irep_get_symbol();
 
 #endif

@@ -10,6 +10,8 @@ int main() {
 
   // IREP
   RUN_TEST(test_irep_read_header);
+  RUN_TEST(test_irep_get_literal);
+  RUN_TEST(test_irep_get_symbol);
 
   // VM
   RUN_TEST(test_mrb_exec);

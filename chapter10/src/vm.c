@@ -1,4 +1,5 @@
 #include<vm.h>
+#include<stdio.h>
 #include<opcode.h>
 
 mrb_value mrb_exec(const uint8_t* bin) {
@@ -44,6 +45,25 @@ mrb_value mrb_exec(const uint8_t* bin) {
       CASE(OP_LOADI_7, B) {
 LOAD_I:
         SET_INT_VALUE(reg[a], insn - OP_LOADI_0);
+        NEXT;
+      }
+      CASE(OP_LOADSELF, B) {
+        // TODO
+        NEXT;
+      }
+      CASE(OP_SEND, BBB) {
+        const uint8_t* sym = irep_get(bin, IREP_TYPE_SYMBOL, b);
+        int len = PEEK_S(sym);
+        mrb_value method_name = mrb_str_new(sym +2, len);
+
+        if(strcmp("puts", method_name.value.p) == 0) {
+#ifndef UNIT_TEST
+          printf("%s\n", (char *)reg[a + 1].value.p);
+#endif
+          reg[a] = reg[a + 1];
+        } else {
+          SET_NIL_VALUE(reg[a]);
+        }
         NEXT;
       }
       CASE(OP_RETURN, B) {
@@ -111,6 +131,16 @@ LOAD_I:
         } else {
           SET_FALSE_VALUE(reg[a]);
         }
+        NEXT;
+      }
+      CASE(OP_STRING, BB) {
+        const uint8_t* lit = irep_get(bin, IREP_TYPE_LITERAL, b);
+        lit += 1; // Skip Type
+        int len = PEEK_S(lit);
+        lit += 2;
+
+        reg[a] = mrb_str_new(lit, len);
+
         NEXT;
       }
     }

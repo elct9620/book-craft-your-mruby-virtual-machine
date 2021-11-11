@@ -1,14 +1,18 @@
 #ifndef MVM_VALUE_H
 #define MVM_VALUE_H
 
+#include<string.h>
+
 enum mrb_vtype {
   MRB_TYPE_FALSE = 0,
   MRB_TYPE_TRUE,
   MRB_TYPE_FIXNUM,
+  MRB_TYPE_STRING,
 };
 
 typedef struct mrb_value {
   union {
+    void *p;
     int i;
   } value;
   enum mrb_vtype type;
@@ -39,6 +43,18 @@ static inline mrb_value mrb_nil_value(void) {
 static inline mrb_value mrb_fixnum_value(int i) {
   mrb_value v;
   SET_INT_VALUE(v, i);
+  return v;
+}
+
+static inline mrb_value mrb_str_new(const uint8_t* p, int len) {
+  mrb_value v;
+
+  char* str = malloc(len + 1);
+  memcpy(str, p, len);
+
+  v.type = MRB_TYPE_STRING;
+  v.value.p = (void*)str;
+
   return v;
 }
 

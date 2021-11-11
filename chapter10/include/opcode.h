@@ -38,6 +38,8 @@ enum {
   OP_LOADI_5,
   OP_LOADI_6,
   OP_LOADI_7,
+  OP_LOADSELF = 16,
+  OP_SEND = 46,
   OP_RETURN = 55,
   OP_ADD = 59,
   OP_ADDI,
@@ -50,6 +52,7 @@ enum {
   OP_LE,
   OP_GT,
   OP_GE,
+  OP_STRING = 79,
 };
 
 #endif

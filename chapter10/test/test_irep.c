@@ -2,8 +2,6 @@
 #include<opcode.h>
 #include "test_irep.h"
 
-#include<stdio.h>
-
 void test_irep_read_header() {
   const uint8_t bin[] = {
     0x00, 0x00, 0x01, 0x00, // Size = 255

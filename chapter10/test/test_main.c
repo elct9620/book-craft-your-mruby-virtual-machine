@@ -4,6 +4,7 @@
 #include "test_vm.h"
 #include "test_math.h"
 #include "test_condition.h"
+#include "test_method.h"
 
 int main() {
   UNITY_BEGIN();
@@ -33,6 +34,9 @@ int main() {
   RUN_TEST(test_opcode_le);
   RUN_TEST(test_opcode_gt);
   RUN_TEST(test_opcode_ge);
+
+  // Methods
+  RUN_TEST(test_method_puts);
 
   return UNITY_END();
 }

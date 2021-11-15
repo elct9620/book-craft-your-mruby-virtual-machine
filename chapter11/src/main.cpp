@@ -1,3 +1,4 @@
+#ifndef UNIT_TEST
 #include <Arduino.h>
 
 #include<vm.h>
@@ -21,3 +22,4 @@ void loop() {
   mrb_exec(bin + 34);
   delay(5000);
 }
+#endif

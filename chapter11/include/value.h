@@ -49,7 +49,7 @@ static inline mrb_value mrb_fixnum_value(int i) {
 static inline mrb_value mrb_str_new(const uint8_t* p, int len) {
   mrb_value v;
 
-  char* str = malloc(len + 1);
+  char* str = (char*)malloc(len + 1);
   memcpy(str, p, len);
 
   v.type = MRB_TYPE_STRING;

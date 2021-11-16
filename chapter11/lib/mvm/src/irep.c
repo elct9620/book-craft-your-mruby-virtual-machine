@@ -1,5 +1,4 @@
-#include<irep.h>
-#include<opcode.h>
+#include<mvm.h>
 
 irep_header* irep_read_header(const uint8_t* p, uint8_t* len) {
   const uint8_t* start = p;

@@ -2,7 +2,7 @@
 #define TEST_CONDITION_H
 
 #include<unity.h>
-#include<vm.h>
+#include<mvm.h>
 
 void test_opcode_eq();
 void test_opcode_lt();

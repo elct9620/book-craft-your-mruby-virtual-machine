@@ -1,8 +1,8 @@
 #ifndef MVM_VM_H
 #define MVM_VM_H
 
-#include "irep.h"
-#include "value.h"
+#include "mvm/irep.h"
+#include "mvm/value.h"
 
 #define CASE(insn,ops) case insn: FETCH_##ops ();;
 #define NEXT break

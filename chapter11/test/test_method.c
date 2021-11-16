@@ -1,4 +1,3 @@
-#include<opcode.h>
 #include "test_method.h"
 
 void test_method_puts() {

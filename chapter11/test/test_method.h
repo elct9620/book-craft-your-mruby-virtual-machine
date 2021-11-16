@@ -2,7 +2,7 @@
 #define TEST_METHOD_H
 
 #include<unity.h>
-#include<vm.h>
+#include<mvm.h>
 
 void test_method_puts();
 

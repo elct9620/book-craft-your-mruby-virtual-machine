@@ -1,6 +1,7 @@
 #ifndef MVM_VALUE_H
 #define MVM_VALUE_H
 
+#include<stdlib.h>
 #include<string.h>
 
 enum mrb_vtype {

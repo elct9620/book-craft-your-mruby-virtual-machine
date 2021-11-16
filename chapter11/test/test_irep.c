@@ -1,5 +1,4 @@
 #include<string.h>
-#include<opcode.h>
 #include "test_irep.h"
 
 void test_irep_read_header() {

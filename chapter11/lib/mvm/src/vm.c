@@ -1,6 +1,5 @@
-#include<vm.h>
 #include<stdio.h>
-#include<opcode.h>
+#include<mvm.h>
 
 mrb_value mrb_exec(const uint8_t* bin) {
   const uint8_t* p = bin;

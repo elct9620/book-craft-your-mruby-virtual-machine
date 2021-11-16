@@ -2,7 +2,7 @@
 #define TEST_MATH_H
 
 #include<unity.h>
-#include<vm.h>
+#include<mvm.h>
 
 void test_opcode_loadi();
 void test_opcode_loadineg();

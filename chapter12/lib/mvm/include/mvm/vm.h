@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-mrb_value mrb_exec(const uint8_t* irep);
+mrb_value mrb_exec(const uint8_t* irep, struct kh_mt_s *methods);
 
 #ifdef __cplusplus
 }

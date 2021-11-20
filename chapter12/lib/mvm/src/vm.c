@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<mvm.h>
 
-mrb_value mrb_exec(const uint8_t* bin) {
+mrb_value mrb_exec(const uint8_t* bin, struct kh_mt_s *methods) {
   const uint8_t* p = bin;
   uint8_t len;
 
@@ -53,9 +53,13 @@ LOAD_I:
       CASE(OP_SEND, BBB) {
         const uint8_t* sym = irep_get(bin, IREP_TYPE_SYMBOL, b);
         int len = PEEK_S(sym);
-        mrb_value method_name = mrb_str_new(sym +2, len);
+        mrb_value method_name = mrb_str_new(sym + 2, len);
 
-        if(strcmp("puts", method_name.value.p) == 0) {
+        khiter_t key = kh_get(mt, methods, (char *)method_name.value.p);
+        if(key != kh_end(methods)) {
+          mrb_func_t func = kh_value(methods, key);
+          func();
+        } else if(strcmp("puts", method_name.value.p) == 0) {
 #ifndef UNIT_TEST
           printf("%s\n", (char *)reg[a + 1].value.p);
 #endif
@@ -63,6 +67,7 @@ LOAD_I:
         } else {
           SET_NIL_VALUE(reg[a]);
         }
+        free(method_name.value.p);
         NEXT;
       }
       CASE(OP_RETURN, B) {

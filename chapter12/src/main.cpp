@@ -24,13 +24,14 @@ mrb_value c_puts() {
   return mrb_nil_value();
 }
 
-static struct kh_mt_s *mvm_methods;
+static mrb_state* mrb;
 
 #if defined(UNIT_TEST) || defined(DEBUG)
 int main(int argc, char** argv) {
-  mvm_methods = kh_init(mt);
-  mrb_define_method("cputs", c_puts, mvm_methods);
-  mrb_exec(bin + 34, mvm_methods);
+  mrb = mrb_open();
+  mrb_define_method(mrb, "cputs", c_puts);
+  mrb_exec(mrb, bin + 34);
+  mrb_close(mrb);
 }
 #else
 #include <Arduino.h>
@@ -38,12 +39,12 @@ int main(int argc, char** argv) {
 void setup() {
   Serial.begin(9600);
 
-  mvm_methods = kh_init(mt);
-  mrb_define_method("cputs", c_puts, mvm_methods);
+  mrb = mrb_open();
+  mrb_define_method(mrb, "cputs");
 }
 
 void loop() {
-  mrb_exec(bin + 34, mvm_methods);
+  mrb_exec(mrb, bin + 34);
   delay(5000);
 }
 #endif

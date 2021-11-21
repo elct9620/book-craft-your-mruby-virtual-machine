@@ -1,7 +1,7 @@
 #include<mvm.h>
 
-void mrb_define_method(const char* name, mrb_func_t func, struct kh_mt_s *methods) {
+void mrb_define_method(mrb_state* mrb, const char* name, mrb_func_t func) {
   int ret;
-  khiter_t key = kh_put(mt, methods, name, &ret);
-  kh_value(methods, key) = func;
+  khiter_t key = kh_put(mt, mrb->mt, name, &ret);
+  kh_value(mrb->mt, key) = func;
 }

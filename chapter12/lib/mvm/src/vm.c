@@ -1,7 +1,24 @@
 #include<stdio.h>
 #include<mvm.h>
 
-mrb_value mrb_exec(const uint8_t* bin, struct kh_mt_s *methods) {
+extern mrb_state* mrb_open() {
+  static const mrb_state mrb_state_zero = { 0 };
+  mrb_state* mrb = (mrb_state*)malloc(sizeof(mrb_state));
+
+  *mrb = mrb_state_zero;
+  mrb->mt = kh_init(mt);
+
+  return mrb;
+}
+
+extern void mrb_close(mrb_state* mrb) {
+  if(!mrb) return;
+
+  kh_destroy(mt, mrb->mt);
+  free(mrb);
+}
+
+mrb_value mrb_exec(mrb_state* mrb, const uint8_t* bin) {
   const uint8_t* p = bin;
   uint8_t len;
 
@@ -55,9 +72,9 @@ LOAD_I:
         int len = PEEK_S(sym);
         mrb_value method_name = mrb_str_new(sym + 2, len);
 
-        khiter_t key = kh_get(mt, methods, (char *)method_name.value.p);
-        if(key != kh_end(methods)) {
-          mrb_func_t func = kh_value(methods, key);
+        khiter_t key = kh_get(mt, mrb->mt, (char *)method_name.value.p);
+        if(key != kh_end(mrb->mt)) {
+          mrb_func_t func = kh_value(mrb->mt, key);
           func();
         } else if(strcmp("puts", method_name.value.p) == 0) {
 #ifndef UNIT_TEST

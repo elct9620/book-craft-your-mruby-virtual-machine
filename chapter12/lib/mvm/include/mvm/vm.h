@@ -11,7 +11,14 @@
 extern "C" {
 #endif
 
-mrb_value mrb_exec(const uint8_t* irep, struct kh_mt_s *methods);
+typedef struct mrb_state {
+  struct kh_mt_s *mt;
+} mrb_state;
+
+extern mrb_state* mrb_open();
+extern void mrb_close(mrb_state* mrb);
+
+mrb_value mrb_exec(mrb_state* mrb, const uint8_t* irep);
 
 #ifdef __cplusplus
 }

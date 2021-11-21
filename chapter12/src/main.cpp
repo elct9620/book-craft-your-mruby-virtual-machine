@@ -1,7 +1,5 @@
-#ifndef UNIT_TEST
-#include <Arduino.h>
-
 #include<mvm.h>
+#include<stdio.h>
 
 #include <stdint.h>
 #if defined __GNUC__
@@ -27,6 +25,16 @@ mrb_value c_puts() {
 }
 
 static struct kh_mt_s *mvm_methods;
+
+#if defined(UNIT_TEST) || defined(DEBUG)
+int main(int argc, char** argv) {
+  mvm_methods = kh_init(mt);
+  mrb_define_method("cputs", c_puts, mvm_methods);
+  mrb_exec(bin + 34, mvm_methods);
+}
+#else
+#include <Arduino.h>
+
 void setup() {
   Serial.begin(9600);
 

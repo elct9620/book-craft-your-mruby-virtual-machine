@@ -15,6 +15,7 @@ extern void mrb_close(mrb_state* mrb) {
   if(!mrb) return;
 
   kh_destroy(mt, mrb->mt);
+  free(mrb->stack);
   free(mrb);
 }
 
@@ -28,12 +29,11 @@ mrb_value mrb_exec(mrb_state* mrb, const uint8_t* bin) {
   READ_L(); // codelen
   SKIP_PADDING();
 
-  // Temp
+  // Register
   int32_t a = 0;
   int32_t b = 0;
   int32_t c = 0;
-  mrb_value reg[irep->nregs];
-
+  mrb->stack = (mrb_value*)malloc(sizeof(mrb_value) * (irep->nregs -  1));
 
   for(;;) {
     uint8_t insn = READ_B();
@@ -43,11 +43,11 @@ mrb_value mrb_exec(mrb_state* mrb, const uint8_t* bin) {
         NEXT;
       }
       CASE(OP_LOADI, BB) {
-        SET_INT_VALUE(reg[a], b);
+        SET_INT_VALUE(mrb->stack[a], b);
         NEXT;
       }
       CASE(OP_LOADINEG, BB) {
-        SET_INT_VALUE(reg[a], b * -1);
+        SET_INT_VALUE(mrb->stack[a], b * -1);
         NEXT;
       }
       CASE(OP_LOADI__1, B) goto LOAD_I;
@@ -60,7 +60,7 @@ mrb_value mrb_exec(mrb_state* mrb, const uint8_t* bin) {
       CASE(OP_LOADI_6, B) goto LOAD_I;
       CASE(OP_LOADI_7, B) {
 LOAD_I:
-        SET_INT_VALUE(reg[a], insn - OP_LOADI_0);
+        SET_INT_VALUE(mrb->stack[a], insn - OP_LOADI_0);
         NEXT;
       }
       CASE(OP_LOADSELF, B) {
@@ -78,79 +78,79 @@ LOAD_I:
           func();
         } else if(strcmp("puts", method_name.value.p) == 0) {
 #ifndef UNIT_TEST
-          printf("%s\n", (char *)reg[a + 1].value.p);
+          printf("%s\n", (char *)mrb->stack[a + 1].value.p);
 #endif
-          reg[a] = reg[a + 1];
+          mrb->stack[a] = mrb->stack[a + 1];
         } else {
-          SET_NIL_VALUE(reg[a]);
+          SET_NIL_VALUE(mrb->stack[a]);
         }
         free(method_name.value.p);
         NEXT;
       }
       CASE(OP_RETURN, B) {
-        return reg[a];
+        return mrb->stack[a];
       }
       CASE(OP_ADD, B) {
-        SET_INT_VALUE(reg[a], mrb_int(reg[a]) + mrb_int(reg[a + 1]));
+        SET_INT_VALUE(mrb->stack[a], mrb_int(mrb->stack[a]) + mrb_int(mrb->stack[a + 1]));
         NEXT;
       }
       CASE(OP_ADDI, BB) {
-        SET_INT_VALUE(reg[a], mrb_int(reg[a]) + b);
+        SET_INT_VALUE(mrb->stack[a], mrb_int(mrb->stack[a]) + b);
         NEXT;
       }
       CASE(OP_SUB, B) {
-        SET_INT_VALUE(reg[a], mrb_int(reg[a]) - mrb_int(reg[a + 1]));
+        SET_INT_VALUE(mrb->stack[a], mrb_int(mrb->stack[a]) - mrb_int(mrb->stack[a + 1]));
         NEXT;
       }
       CASE(OP_SUBI, BB) {
-        SET_INT_VALUE(reg[a], mrb_int(reg[a]) - b);
+        SET_INT_VALUE(mrb->stack[a], mrb_int(mrb->stack[a]) - b);
         NEXT;
       }
       CASE(OP_MUL, B) {
-        SET_INT_VALUE(reg[a], mrb_int(reg[a]) * mrb_int(reg[a + 1]));
+        SET_INT_VALUE(mrb->stack[a], mrb_int(mrb->stack[a]) * mrb_int(mrb->stack[a + 1]));
         NEXT;
       }
       CASE(OP_DIV, B) {
-        SET_INT_VALUE(reg[a], mrb_int(reg[a]) / mrb_int(reg[a + 1]));
+        SET_INT_VALUE(mrb->stack[a], mrb_int(mrb->stack[a]) / mrb_int(mrb->stack[a + 1]));
         NEXT;
       }
       CASE(OP_EQ, B) {
-        if(mrb_int(reg[a]) == mrb_int(reg[a + 1])) {
-          SET_TRUE_VALUE(reg[a]);
+        if(mrb_int(mrb->stack[a]) == mrb_int(mrb->stack[a + 1])) {
+          SET_TRUE_VALUE(mrb->stack[a]);
         } else {
-          SET_FALSE_VALUE(reg[a]);
+          SET_FALSE_VALUE(mrb->stack[a]);
         }
         NEXT;
       }
       CASE(OP_LT, B) {
-        if(mrb_int(reg[a]) < mrb_int(reg[a + 1])) {
-          SET_TRUE_VALUE(reg[a]);
+        if(mrb_int(mrb->stack[a]) < mrb_int(mrb->stack[a + 1])) {
+          SET_TRUE_VALUE(mrb->stack[a]);
         } else {
-          SET_FALSE_VALUE(reg[a]);
+          SET_FALSE_VALUE(mrb->stack[a]);
         }
         NEXT;
       }
       CASE(OP_LE, B) {
-        if(mrb_int(reg[a]) <= mrb_int(reg[a + 1])) {
-          SET_TRUE_VALUE(reg[a]);
+        if(mrb_int(mrb->stack[a]) <= mrb_int(mrb->stack[a + 1])) {
+          SET_TRUE_VALUE(mrb->stack[a]);
         } else {
-          SET_FALSE_VALUE(reg[a]);
+          SET_FALSE_VALUE(mrb->stack[a]);
         }
         NEXT;
       }
       CASE(OP_GT, B) {
-        if(mrb_int(reg[a]) > mrb_int(reg[a + 1])) {
-          SET_TRUE_VALUE(reg[a]);
+        if(mrb_int(mrb->stack[a]) > mrb_int(mrb->stack[a + 1])) {
+          SET_TRUE_VALUE(mrb->stack[a]);
         } else {
-          SET_FALSE_VALUE(reg[a]);
+          SET_FALSE_VALUE(mrb->stack[a]);
         }
         NEXT;
       }
       CASE(OP_GE, B) {
-        if(mrb_int(reg[a]) >= mrb_int(reg[a + 1])) {
-          SET_TRUE_VALUE(reg[a]);
+        if(mrb_int(mrb->stack[a]) >= mrb_int(mrb->stack[a + 1])) {
+          SET_TRUE_VALUE(mrb->stack[a]);
         } else {
-          SET_FALSE_VALUE(reg[a]);
+          SET_FALSE_VALUE(mrb->stack[a]);
         }
         NEXT;
       }
@@ -160,14 +160,12 @@ LOAD_I:
         int len = PEEK_S(lit);
         lit += 2;
 
-        reg[a] = mrb_str_new(lit, len);
+        mrb->stack[a] = mrb_str_new(lit, len);
 
         NEXT;
       }
     }
   }
 
-  // TODO: Next refactor to return nil
-  mrb_value v;
-  return v;
+  return mrb_nil_value();
 }

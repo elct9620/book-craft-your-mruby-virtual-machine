@@ -26,13 +26,15 @@ mrb_value c_puts() {
 
 static mrb_state* mrb;
 
-#if defined(UNIT_TEST) || defined(DEBUG)
+#ifdef DEBUG
+#ifndef UNIT_TEST
 int main(int argc, char** argv) {
   mrb = mrb_open();
   mrb_define_method(mrb, "cputs", c_puts);
   mrb_exec(mrb, bin + 34);
   mrb_close(mrb);
 }
+#endif
 #else
 #include <Arduino.h>
 

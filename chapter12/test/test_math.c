@@ -13,7 +13,9 @@ void test_opcode_loadi() {
     0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  mrb_value ret = mrb_exec(bin + 34);
+  mrb_state* mrb = mrb_open();
+  mrb_value ret = mrb_exec(mrb, bin + 34);
+  mrb_close(mrb);
 
   TEST_ASSERT_EQUAL_UINT32(99, ret.value.i);
 }
@@ -31,7 +33,9 @@ void test_opcode_loadineg() {
     0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  mrb_value ret = mrb_exec(bin + 34);
+  mrb_state* mrb = mrb_open();
+  mrb_value ret = mrb_exec(mrb, bin + 34);
+  mrb_close(mrb);
 
   TEST_ASSERT_EQUAL_UINT32(-101, ret.value.i);
 }
@@ -49,7 +53,9 @@ void test_opcode_loadi__1() {
     0x00,0x00,0x00,0x00,0x08,
   };
 
-  mrb_value ret = mrb_exec(bin + 34);
+  mrb_state* mrb = mrb_open();
+  mrb_value ret = mrb_exec(mrb, bin + 34);
+  mrb_close(mrb);
 
   TEST_ASSERT_EQUAL_UINT32(-1, ret.value.i);
 }
@@ -67,7 +73,9 @@ void test_opcode_add() {
     0x45,0x4e,0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  mrb_value ret = mrb_exec(bin + 34);
+  mrb_state* mrb = mrb_open();
+  mrb_value ret = mrb_exec(mrb, bin + 34);
+  mrb_close(mrb);
 
   TEST_ASSERT_EQUAL_UINT32(101, ret.value.i);
 }
@@ -85,7 +93,9 @@ void test_opcode_addi() {
     0x00,0x45,0x4e,0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  mrb_value ret = mrb_exec(bin + 34);
+  mrb_state* mrb = mrb_open();
+  mrb_value ret = mrb_exec(mrb, bin + 34);
+  mrb_close(mrb);
 
   TEST_ASSERT_EQUAL_UINT32(102, ret.value.i);
 }
@@ -103,7 +113,9 @@ void test_opcode_sub() {
     0x00,0x45,0x4e,0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  mrb_value ret = mrb_exec(bin + 34);
+  mrb_state* mrb = mrb_open();
+  mrb_value ret = mrb_exec(mrb, bin + 34);
+  mrb_close(mrb);
 
   TEST_ASSERT_EQUAL_UINT32(1, ret.value.i);
 }
@@ -121,7 +133,9 @@ void test_opcode_subi() {
     0x00,0x45,0x4e,0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  mrb_value ret = mrb_exec(bin + 34);
+  mrb_state* mrb = mrb_open();
+  mrb_value ret = mrb_exec(mrb, bin + 34);
+  mrb_close(mrb);
 
   TEST_ASSERT_EQUAL_UINT32(99, ret.value.i);
 }
@@ -139,7 +153,9 @@ void test_opcode_mul() {
     0x00,0x00,0x00,0x45,0x4e,0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  mrb_value ret = mrb_exec(bin + 34);
+  mrb_state* mrb = mrb_open();
+  mrb_value ret = mrb_exec(mrb, bin + 34);
+  mrb_close(mrb);
 
   TEST_ASSERT_EQUAL_UINT32(100, ret.value.i);
 }
@@ -157,7 +173,9 @@ void test_opcode_div() {
     0x00,0x00,0x45,0x4e,0x44,0x00,0x00,0x00,0x00,0x08,
   };
 
-  mrb_value ret = mrb_exec(bin + 34);
+  mrb_state* mrb = mrb_open();
+  mrb_value ret = mrb_exec(mrb, bin + 34);
+  mrb_close(mrb);
 
   TEST_ASSERT_EQUAL_UINT32(3, ret.value.i);
 }

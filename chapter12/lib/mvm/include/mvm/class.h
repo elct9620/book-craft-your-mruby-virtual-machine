@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-typedef mrb_value (*mrb_func_t)();
+typedef mrb_value (*mrb_func_t)(mrb_state* mrb);
 
 KHASH_MAP_INIT_STR(mt, mrb_func_t)
 

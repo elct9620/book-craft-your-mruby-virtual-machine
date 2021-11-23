@@ -11,9 +11,15 @@
 extern "C" {
 #endif
 
+typedef struct mrb_callinfo {
+  int argc;
+  mrb_value* argv;
+} mrb_callinfo;
+
 typedef struct mrb_state {
   struct kh_mt_s *mt;
 
+  mrb_callinfo* ci;
   mrb_value* stack;
 } mrb_state;
 

@@ -72,10 +72,17 @@ LOAD_I:
         int len = PEEK_S(sym);
         mrb_value method_name = mrb_str_new(sym + 2, len);
 
+        mrb_callinfo ci = {
+          .argc = c,
+          .argv = &mrb->stack[a + 1]
+        };
+
+        mrb->ci = &ci;
+
         khiter_t key = kh_get(mt, mrb->mt, (char *)method_name.value.p);
         if(key != kh_end(mrb->mt)) {
           mrb_func_t func = kh_value(mrb->mt, key);
-          func();
+          func(mrb);
         } else if(strcmp("puts", method_name.value.p) == 0) {
 #ifndef UNIT_TEST
           printf("%s\n", (char *)mrb->stack[a + 1].value.p);
@@ -84,6 +91,8 @@ LOAD_I:
         } else {
           SET_NIL_VALUE(mrb->stack[a]);
         }
+
+        mrb->ci = NULL;
         free(method_name.value.p);
         NEXT;
       }

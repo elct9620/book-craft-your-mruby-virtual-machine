@@ -33,6 +33,7 @@ mrb_value mrb_exec(mrb_state* mrb, const uint8_t* bin) {
   int32_t a = 0;
   int32_t b = 0;
   int32_t c = 0;
+  const uint8_t* prog = p;
   mrb->stack = (mrb_value*)malloc(sizeof(mrb_value) * (irep->nregs -  1));
 
   for(;;) {
@@ -63,8 +64,27 @@ LOAD_I:
         SET_INT_VALUE(mrb->stack[a], insn - OP_LOADI_0);
         NEXT;
       }
+      CASE(OP_LOADNIL, B) {
+        mrb->stack[a] = mrb_nil_value();
+        NEXT;
+      }
       CASE(OP_LOADSELF, B) {
         // TODO
+        NEXT;
+      }
+      CASE(OP_LOADT, B) {
+        mrb->stack[a] = mrb_nil_value();
+        SET_TRUE_VALUE(mrb->stack[a]);
+        NEXT;
+      }
+      CASE(OP_JMP, S) {
+        p = prog + a;
+        NEXT;
+      }
+      CASE(OP_JMPIF, BS) {
+        if (mrb->stack[a].type != MRB_TYPE_FALSE) {
+          p = prog + b;
+        }
         NEXT;
       }
       CASE(OP_SEND, BBB) {

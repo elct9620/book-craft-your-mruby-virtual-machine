@@ -72,9 +72,15 @@ LOAD_I:
         // TODO
         NEXT;
       }
-      CASE(OP_LOADT, B) {
+      CASE(OP_LOADT, B) goto L_LOADF;
+      CASE(OP_LOADF, B) {
+L_LOADF:
         mrb->stack[a] = mrb_nil_value();
-        SET_TRUE_VALUE(mrb->stack[a]);
+        if(insn == OP_LOADT) {
+          SET_TRUE_VALUE(mrb->stack[a]);
+        } else {
+          SET_FALSE_VALUE(mrb->stack[a]);
+        }
         NEXT;
       }
       CASE(OP_JMP, S) {
@@ -82,7 +88,19 @@ LOAD_I:
         NEXT;
       }
       CASE(OP_JMPIF, BS) {
-        if (mrb->stack[a].type != MRB_TYPE_FALSE) {
+        if (!IS_FALSE_VALUE(mrb->stack[a])) {
+          p = prog + b;
+        }
+        NEXT;
+      }
+      CASE(OP_JMPNOT, BS) {
+        if (IS_FALSE_VALUE(mrb->stack[a])) {
+          p = prog + b;
+        }
+        NEXT;
+      }
+      CASE(OP_JMPNIL, BS) {
+        if (IS_FALSE_VALUE(mrb->stack[a]) && !mrb_fixnum(mrb->stack[a])) {
           p = prog + b;
         }
         NEXT;

@@ -30,7 +30,7 @@ typedef struct mrb_value {
 #define SET_TRUE_VALUE(r) SET_VALUE(r, MRB_TYPE_TRUE, value.i, 1)
 #define SET_INT_VALUE(r, n) SET_VALUE(r, MRB_TYPE_FIXNUM, value.i, (n))
 
-#define IS_FALSE_VALUE(r) (r.tt == MRB_TYPE_FALSE)
+#define IS_FALSE_VALUE(r) (r.type == MRB_TYPE_FALSE)
 
 #define mrb_fixnum(o) (o).value.i
 #define mrb_int(o) mrb_fixnum(o)

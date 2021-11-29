@@ -27,6 +27,7 @@
 
 enum {
   OP_NOP,
+  OP_MOVE,
   OP_LOADI = 3,
   OP_LOADINEG,
   OP_LOADI__1,

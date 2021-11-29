@@ -43,6 +43,10 @@ mrb_value mrb_exec(mrb_state* mrb, const uint8_t* bin) {
       CASE(OP_NOP, Z) {
         NEXT;
       }
+      CASE(OP_MOVE, BB) {
+        mrb->stack[a] = mrb->stack[b];
+        NEXT;
+      }
       CASE(OP_LOADI, BB) {
         SET_INT_VALUE(mrb->stack[a], b);
         NEXT;

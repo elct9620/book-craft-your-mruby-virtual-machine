@@ -4,6 +4,7 @@
 #include "test_vm.h"
 #include "test_math.h"
 #include "test_condition.h"
+#include "test_loop.h"
 #include "test_method.h"
 
 int main() {
@@ -34,6 +35,9 @@ int main() {
   RUN_TEST(test_opcode_le);
   RUN_TEST(test_opcode_gt);
   RUN_TEST(test_opcode_ge);
+
+  // VM_Loop
+  RUN_TEST(test_while_loop);
 
   // Methods
   RUN_TEST(test_method_puts);

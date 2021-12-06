@@ -138,6 +138,37 @@ L_LOADF:
         free(method_name.value.p);
         NEXT;
       }
+      CASE(OP_SENDB, BBB) {
+        const uint8_t* sym = irep_get(bin, IREP_TYPE_SYMBOL, b);
+        int len = PEEK_S(sym);
+        mrb_value method_name = mrb_str_new(sym + 2, len);
+
+        khiter_t key = kh_get(mt, mrb->mt, (char *)method_name.value.p);
+        if(key != kh_end(mrb->mt)) {
+          mrb_func_t func = kh_value(mrb->mt, key);
+
+          mrb_value argv[c + 1];
+          for(int i = 0; i <= c; i++) {
+            argv[i] = mrb->stack[a + i + 1];
+          }
+
+          mrb_callinfo ci = { .argc = c + 1, .argv = argv };
+          mrb->ci = &ci;
+
+          func(mrb);
+        } else {
+          SET_NIL_VALUE(mrb->stack[a]);
+        }
+
+        mrb->ci = NULL;
+        free(method_name.value.p);
+
+        NEXT;
+      }
+      CASE(OP_ENTER, W) {
+        // TODO
+        NEXT;
+      }
       CASE(OP_RETURN, B) {
         return mrb->stack[a];
       }
@@ -213,6 +244,13 @@ L_LOADF:
 
         mrb->stack[a] = mrb_str_new(lit, len);
 
+        NEXT;
+      }
+      CASE(OP_BLOCK, BB) {
+        mrb_value proc;
+        proc.type = MRB_TYPE_PROC;
+        proc.value.p = (void*)irep_get(bin, IREP_TYPE_IREP, b);
+        mrb->stack[a] = proc;
         NEXT;
       }
     }

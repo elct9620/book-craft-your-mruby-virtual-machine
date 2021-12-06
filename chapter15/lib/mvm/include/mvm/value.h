@@ -9,6 +9,7 @@ enum mrb_vtype {
   MRB_TYPE_TRUE,
   MRB_TYPE_FIXNUM,
   MRB_TYPE_STRING,
+  MRB_TYPE_PROC,
 };
 
 typedef struct mrb_value {

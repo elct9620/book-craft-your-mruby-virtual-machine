@@ -51,6 +51,7 @@ const uint8_t* irep_get(const uint8_t* p, int type, int idx) {
     for(int i = 0; i < nsym; i++) {
       uint16_t size = READ_S();
       p += size;
+      p += 1;
     }
 
     if(type == IREP_TYPE_SYMBOL) {

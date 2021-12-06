@@ -24,6 +24,7 @@
 #define FETCH_BBB() do { a = READ_B(); b = READ_B(); c = READ_B(); } while(0)
 #define FETCH_BS() do { a = READ_B(); b = READ_S(); } while(0)
 #define FETCH_S() do { a = READ_S(); } while(0)
+#define FETCH_W() do { a = READ_W(); } while(0)
 
 enum {
   OP_NOP,
@@ -48,6 +49,8 @@ enum {
   OP_JMPNOT,
   OP_JMPNIL,
   OP_SEND = 46,
+  OP_SENDB,
+  OP_ENTER = 51,
   OP_RETURN = 55,
   OP_ADD = 59,
   OP_ADDI,
@@ -61,6 +64,7 @@ enum {
   OP_GT,
   OP_GE,
   OP_STRING = 79,
+  OP_BLOCK = 85,
 };
 
 #endif

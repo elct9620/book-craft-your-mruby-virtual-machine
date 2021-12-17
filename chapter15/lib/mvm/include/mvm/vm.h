@@ -20,7 +20,6 @@ typedef struct mrb_state {
   struct kh_mt_s *mt;
 
   mrb_callinfo* ci;
-  mrb_value* stack;
 } mrb_state;
 
 extern mrb_state* mrb_open();

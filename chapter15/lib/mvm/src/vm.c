@@ -15,7 +15,6 @@ extern void mrb_close(mrb_state* mrb) {
   if(!mrb) return;
 
   kh_destroy(mt, mrb->mt);
-  free(mrb->stack);
   free(mrb);
 }
 
@@ -34,7 +33,7 @@ mrb_value mrb_exec(mrb_state* mrb, const uint8_t* bin) {
   int32_t b = 0;
   int32_t c = 0;
   const uint8_t* prog = p;
-  mrb->stack = (mrb_value*)malloc(sizeof(mrb_value) * (irep->nregs -  1));
+  mrb_value stack[irep->nregs];
 
   for(;;) {
     uint8_t insn = READ_B();
@@ -44,15 +43,15 @@ mrb_value mrb_exec(mrb_state* mrb, const uint8_t* bin) {
         NEXT;
       }
       CASE(OP_MOVE, BB) {
-        mrb->stack[a] = mrb->stack[b];
+        stack[a] = stack[b];
         NEXT;
       }
       CASE(OP_LOADI, BB) {
-        SET_INT_VALUE(mrb->stack[a], b);
+        SET_INT_VALUE(stack[a], b);
         NEXT;
       }
       CASE(OP_LOADINEG, BB) {
-        SET_INT_VALUE(mrb->stack[a], b * -1);
+        SET_INT_VALUE(stack[a], b * -1);
         NEXT;
       }
       CASE(OP_LOADI__1, B) goto LOAD_I;
@@ -65,11 +64,11 @@ mrb_value mrb_exec(mrb_state* mrb, const uint8_t* bin) {
       CASE(OP_LOADI_6, B) goto LOAD_I;
       CASE(OP_LOADI_7, B) {
 LOAD_I:
-        SET_INT_VALUE(mrb->stack[a], insn - OP_LOADI_0);
+        SET_INT_VALUE(stack[a], insn - OP_LOADI_0);
         NEXT;
       }
       CASE(OP_LOADNIL, B) {
-        mrb->stack[a] = mrb_nil_value();
+        stack[a] = mrb_nil_value();
         NEXT;
       }
       CASE(OP_LOADSELF, B) {
@@ -79,11 +78,11 @@ LOAD_I:
       CASE(OP_LOADT, B) goto L_LOADF;
       CASE(OP_LOADF, B) {
 L_LOADF:
-        mrb->stack[a] = mrb_nil_value();
+        stack[a] = mrb_nil_value();
         if(insn == OP_LOADT) {
-          SET_TRUE_VALUE(mrb->stack[a]);
+          SET_TRUE_VALUE(stack[a]);
         } else {
-          SET_FALSE_VALUE(mrb->stack[a]);
+          SET_FALSE_VALUE(stack[a]);
         }
         NEXT;
       }
@@ -92,19 +91,19 @@ L_LOADF:
         NEXT;
       }
       CASE(OP_JMPIF, BS) {
-        if (!IS_FALSE_VALUE(mrb->stack[a])) {
+        if (!IS_FALSE_VALUE(stack[a])) {
           p = prog + b;
         }
         NEXT;
       }
       CASE(OP_JMPNOT, BS) {
-        if (IS_FALSE_VALUE(mrb->stack[a])) {
+        if (IS_FALSE_VALUE(stack[a])) {
           p = prog + b;
         }
         NEXT;
       }
       CASE(OP_JMPNIL, BS) {
-        if (IS_FALSE_VALUE(mrb->stack[a]) && !mrb_fixnum(mrb->stack[a])) {
+        if (IS_FALSE_VALUE(stack[a]) && !mrb_fixnum(stack[a])) {
           p = prog + b;
         }
         NEXT;
@@ -116,7 +115,7 @@ L_LOADF:
 
         mrb_callinfo ci = {
           .argc = c,
-          .argv = &mrb->stack[a + 1]
+          .argv = &stack[a + 1]
         };
 
         mrb->ci = &ci;
@@ -127,11 +126,11 @@ L_LOADF:
           func(mrb);
         } else if(strcmp("puts", method_name.value.p) == 0) {
 #ifndef UNIT_TEST
-          printf("%s\n", (char *)mrb->stack[a + 1].value.p);
+          printf("%s\n", (char *)stack[a + 1].value.p);
 #endif
-          mrb->stack[a] = mrb->stack[a + 1];
+          stack[a] = stack[a + 1];
         } else {
-          SET_NIL_VALUE(mrb->stack[a]);
+          SET_NIL_VALUE(stack[a]);
         }
 
         mrb->ci = NULL;
@@ -149,7 +148,7 @@ L_LOADF:
 
           mrb_value argv[c + 1];
           for(int i = 0; i <= c; i++) {
-            argv[i] = mrb->stack[a + i + 1];
+            argv[i] = stack[a + i + 1];
           }
 
           mrb_callinfo ci = { .argc = c + 1, .argv = argv };
@@ -157,7 +156,7 @@ L_LOADF:
 
           func(mrb);
         } else {
-          SET_NIL_VALUE(mrb->stack[a]);
+          SET_NIL_VALUE(stack[a]);
         }
 
         mrb->ci = NULL;
@@ -170,69 +169,69 @@ L_LOADF:
         NEXT;
       }
       CASE(OP_RETURN, B) {
-        return mrb->stack[a];
+        return stack[a];
       }
       CASE(OP_ADD, B) {
-        SET_INT_VALUE(mrb->stack[a], mrb_int(mrb->stack[a]) + mrb_int(mrb->stack[a + 1]));
+        SET_INT_VALUE(stack[a], mrb_int(stack[a]) + mrb_int(stack[a + 1]));
         NEXT;
       }
       CASE(OP_ADDI, BB) {
-        SET_INT_VALUE(mrb->stack[a], mrb_int(mrb->stack[a]) + b);
+        SET_INT_VALUE(stack[a], mrb_int(stack[a]) + b);
         NEXT;
       }
       CASE(OP_SUB, B) {
-        SET_INT_VALUE(mrb->stack[a], mrb_int(mrb->stack[a]) - mrb_int(mrb->stack[a + 1]));
+        SET_INT_VALUE(stack[a], mrb_int(stack[a]) - mrb_int(stack[a + 1]));
         NEXT;
       }
       CASE(OP_SUBI, BB) {
-        SET_INT_VALUE(mrb->stack[a], mrb_int(mrb->stack[a]) - b);
+        SET_INT_VALUE(stack[a], mrb_int(stack[a]) - b);
         NEXT;
       }
       CASE(OP_MUL, B) {
-        SET_INT_VALUE(mrb->stack[a], mrb_int(mrb->stack[a]) * mrb_int(mrb->stack[a + 1]));
+        SET_INT_VALUE(stack[a], mrb_int(stack[a]) * mrb_int(stack[a + 1]));
         NEXT;
       }
       CASE(OP_DIV, B) {
-        SET_INT_VALUE(mrb->stack[a], mrb_int(mrb->stack[a]) / mrb_int(mrb->stack[a + 1]));
+        SET_INT_VALUE(stack[a], mrb_int(stack[a]) / mrb_int(stack[a + 1]));
         NEXT;
       }
       CASE(OP_EQ, B) {
-        if(mrb_int(mrb->stack[a]) == mrb_int(mrb->stack[a + 1])) {
-          SET_TRUE_VALUE(mrb->stack[a]);
+        if(mrb_int(stack[a]) == mrb_int(stack[a + 1])) {
+          SET_TRUE_VALUE(stack[a]);
         } else {
-          SET_FALSE_VALUE(mrb->stack[a]);
+          SET_FALSE_VALUE(stack[a]);
         }
         NEXT;
       }
       CASE(OP_LT, B) {
-        if(mrb_int(mrb->stack[a]) < mrb_int(mrb->stack[a + 1])) {
-          SET_TRUE_VALUE(mrb->stack[a]);
+        if(mrb_int(stack[a]) < mrb_int(stack[a + 1])) {
+          SET_TRUE_VALUE(stack[a]);
         } else {
-          SET_FALSE_VALUE(mrb->stack[a]);
+          SET_FALSE_VALUE(stack[a]);
         }
         NEXT;
       }
       CASE(OP_LE, B) {
-        if(mrb_int(mrb->stack[a]) <= mrb_int(mrb->stack[a + 1])) {
-          SET_TRUE_VALUE(mrb->stack[a]);
+        if(mrb_int(stack[a]) <= mrb_int(stack[a + 1])) {
+          SET_TRUE_VALUE(stack[a]);
         } else {
-          SET_FALSE_VALUE(mrb->stack[a]);
+          SET_FALSE_VALUE(stack[a]);
         }
         NEXT;
       }
       CASE(OP_GT, B) {
-        if(mrb_int(mrb->stack[a]) > mrb_int(mrb->stack[a + 1])) {
-          SET_TRUE_VALUE(mrb->stack[a]);
+        if(mrb_int(stack[a]) > mrb_int(stack[a + 1])) {
+          SET_TRUE_VALUE(stack[a]);
         } else {
-          SET_FALSE_VALUE(mrb->stack[a]);
+          SET_FALSE_VALUE(stack[a]);
         }
         NEXT;
       }
       CASE(OP_GE, B) {
-        if(mrb_int(mrb->stack[a]) >= mrb_int(mrb->stack[a + 1])) {
-          SET_TRUE_VALUE(mrb->stack[a]);
+        if(mrb_int(stack[a]) >= mrb_int(stack[a + 1])) {
+          SET_TRUE_VALUE(stack[a]);
         } else {
-          SET_FALSE_VALUE(mrb->stack[a]);
+          SET_FALSE_VALUE(stack[a]);
         }
         NEXT;
       }
@@ -242,7 +241,7 @@ L_LOADF:
         int len = PEEK_S(lit);
         lit += 2;
 
-        mrb->stack[a] = mrb_str_new(lit, len);
+        stack[a] = mrb_str_new(lit, len);
 
         NEXT;
       }
@@ -250,7 +249,7 @@ L_LOADF:
         mrb_value proc;
         proc.type = MRB_TYPE_PROC;
         proc.value.p = (void*)irep_get(bin, IREP_TYPE_IREP, b);
-        mrb->stack[a] = proc;
+        stack[a] = proc;
         NEXT;
       }
     }

@@ -52,6 +52,7 @@ enum {
   OP_SENDB,
   OP_ENTER = 51,
   OP_RETURN = 55,
+  OP_BREAK = 57,
   OP_ADD = 59,
   OP_ADDI,
   OP_SUB,

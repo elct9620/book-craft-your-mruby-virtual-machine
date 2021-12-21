@@ -171,6 +171,10 @@ L_LOADF:
       CASE(OP_RETURN, B) {
         return stack[a];
       }
+      CASE(OP_BREAK, B) {
+        mrb->exc = 1;
+        NEXT;
+      }
       CASE(OP_ADD, B) {
         SET_INT_VALUE(stack[a], mrb_int(stack[a]) + mrb_int(stack[a + 1]));
         NEXT;

@@ -19,6 +19,7 @@ typedef struct mrb_callinfo {
 typedef struct mrb_state {
   struct kh_mt_s *mt;
 
+  int exc;
   mrb_callinfo* ci;
 } mrb_state;
 

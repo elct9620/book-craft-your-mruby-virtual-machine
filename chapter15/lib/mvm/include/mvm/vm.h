@@ -16,11 +16,16 @@ typedef struct mrb_callinfo {
   mrb_value* argv;
 } mrb_callinfo;
 
+typedef struct mrb_context {
+  mrb_value* stack;
+} mrb_context;
+
 typedef struct mrb_state {
   struct kh_mt_s *mt;
 
   int exc;
   mrb_callinfo* ci;
+  mrb_context* ctx;
 } mrb_state;
 
 extern mrb_state* mrb_open();

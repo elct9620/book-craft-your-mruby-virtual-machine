@@ -86,6 +86,16 @@ L_LOADF:
         }
         NEXT;
       }
+      CASE(OP_GETUPVAR, BBB) goto L_UPVAR;
+      CASE(OP_SETUPVAR, BBB) {
+L_UPVAR:
+        if (insn == OP_GETUPVAR) {
+          stack[a] = mrb->ctx->stack[b];
+        } else {
+          mrb->ctx->stack[b] = stack[a];
+        }
+        NEXT;
+      }
       CASE(OP_JMP, S) {
         p = prog + a;
         NEXT;
@@ -113,11 +123,7 @@ L_LOADF:
         int len = PEEK_S(sym);
         mrb_value method_name = mrb_str_new(sym + 2, len);
 
-        mrb_callinfo ci = {
-          .argc = c,
-          .argv = &stack[a + 1]
-        };
-
+        mrb_callinfo ci = { .argc = c, .argv = &stack[a + 1] };
         mrb->ci = &ci;
 
         khiter_t key = kh_get(mt, mrb->mt, (char *)method_name.value.p);
@@ -133,7 +139,6 @@ L_LOADF:
           SET_NIL_VALUE(stack[a]);
         }
 
-        mrb->ci = NULL;
         free(method_name.value.p);
         NEXT;
       }
@@ -152,14 +157,16 @@ L_LOADF:
           }
 
           mrb_callinfo ci = { .argc = c + 1, .argv = argv };
+          mrb_context ctx = { .stack = stack };
           mrb->ci = &ci;
+          mrb->ctx = &ctx;
 
           func(mrb);
         } else {
           SET_NIL_VALUE(stack[a]);
         }
 
-        mrb->ci = NULL;
+        mrb->ctx = NULL;
         free(method_name.value.p);
 
         NEXT;

@@ -38,6 +38,7 @@ int main() {
 
   // VM_Loop
   RUN_TEST(test_while_loop);
+  RUN_TEST(test_c_loop);
 
   // Methods
   RUN_TEST(test_method_puts);

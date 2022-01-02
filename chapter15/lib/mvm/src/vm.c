@@ -129,7 +129,7 @@ L_UPVAR:
         khiter_t key = kh_get(mt, mrb->mt, (char *)method_name.value.p);
         if(key != kh_end(mrb->mt)) {
           mrb_func_t func = kh_value(mrb->mt, key);
-          func(mrb);
+          stack[a] = func(mrb);
         } else if(strcmp("puts", method_name.value.p) == 0) {
 #ifndef UNIT_TEST
           printf("%s\n", (char *)stack[a + 1].value.p);
@@ -161,7 +161,7 @@ L_UPVAR:
           mrb->ci = &ci;
           mrb->ctx = &ctx;
 
-          func(mrb);
+          stack[a] = func(mrb);
         } else {
           SET_NIL_VALUE(stack[a]);
         }

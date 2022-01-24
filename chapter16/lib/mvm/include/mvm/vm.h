@@ -3,6 +3,7 @@
 
 #include "mvm/irep.h"
 #include "mvm/value.h"
+#include "mvm/class.h"
 
 #define CASE(insn,ops) case insn: FETCH_##ops ();;
 #define NEXT break
@@ -21,7 +22,7 @@ typedef struct mrb_context {
 } mrb_context;
 
 typedef struct mrb_state {
-  struct kh_mt_s *mt;
+  struct RClass* object_class;
 
   int exc;
   mrb_callinfo* ci;

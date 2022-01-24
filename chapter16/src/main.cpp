@@ -55,8 +55,8 @@ static mrb_state* mrb;
 #ifndef UNIT_TEST
 int main(int argc, char** argv) {
   mrb = mrb_open();
-  mrb_define_method(mrb, "cputs", c_puts);
-  mrb_define_method(mrb, "loop", c_loop);
+  mrb_define_method(mrb->object_class, "cputs", c_puts);
+  mrb_define_method(mrb->object_class, "loop", c_loop);
   mrb_exec(mrb, bin + 34);
   mrb_close(mrb);
 }
@@ -68,7 +68,7 @@ void setup() {
   Serial.begin(9600);
 
   mrb = mrb_open();
-  mrb_define_method(mrb, "cputs");
+  mrb_define_method(mrb->object_class, "cputs");
 }
 
 void loop() {

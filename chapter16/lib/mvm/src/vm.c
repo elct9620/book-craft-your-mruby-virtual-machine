@@ -6,7 +6,7 @@ extern mrb_state* mrb_open() {
   mrb_state* mrb = (mrb_state*)malloc(sizeof(mrb_state));
 
   *mrb = mrb_state_zero;
-  mrb->mt = kh_init(mt);
+  mrb->object_class = mrb_alloc_class(NULL);
 
   return mrb;
 }
@@ -14,7 +14,8 @@ extern mrb_state* mrb_open() {
 extern void mrb_close(mrb_state* mrb) {
   if(!mrb) return;
 
-  kh_destroy(mt, mrb->mt);
+  kh_destroy(mt, mrb->object_class->mt);
+  free(mrb->object_class);
   free(mrb);
 }
 
@@ -126,9 +127,9 @@ L_UPVAR:
         mrb_callinfo ci = { .argc = c, .argv = &stack[a + 1] };
         mrb->ci = &ci;
 
-        khiter_t key = kh_get(mt, mrb->mt, (char *)method_name.value.p);
-        if(key != kh_end(mrb->mt)) {
-          mrb_func_t func = kh_value(mrb->mt, key);
+        khiter_t key = kh_get(mt, mrb->object_class->mt, (char *)method_name.value.p);
+        if(key != kh_end(mrb->object_class->mt)) {
+          mrb_func_t func = kh_value(mrb->object_class->mt, key);
           stack[a] = func(mrb);
         } else if(strcmp("puts", method_name.value.p) == 0) {
 #ifndef UNIT_TEST
@@ -147,9 +148,9 @@ L_UPVAR:
         int len = PEEK_S(sym);
         mrb_value method_name = mrb_str_new(sym + 2, len);
 
-        khiter_t key = kh_get(mt, mrb->mt, (char *)method_name.value.p);
-        if(key != kh_end(mrb->mt)) {
-          mrb_func_t func = kh_value(mrb->mt, key);
+        khiter_t key = kh_get(mt, mrb->object_class->mt, (char *)method_name.value.p);
+        if(key != kh_end(mrb->object_class->mt)) {
+          mrb_func_t func = kh_value(mrb->object_class->mt, key);
 
           mrb_value argv[c + 1];
           for(int i = 0; i <= c; i++) {

@@ -67,7 +67,7 @@ void test_c_loop() {
   };
 
   mrb_state* mrb = mrb_open();
-  mrb_define_method(mrb, "loop", c_loop);
+  mrb_define_method(mrb->object_class, "loop", c_loop);
   mrb_value ret = mrb_exec(mrb, bin + 34);
   mrb_close(mrb);
 

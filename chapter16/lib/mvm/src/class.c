@@ -13,3 +13,13 @@ RClass* mrb_alloc_class(RClass* super) {
 
   return klass;
 }
+
+RClass* mrb_define_class(mrb_state* mrb, const char* name, RClass* super) {
+  int ret;
+  RClass* klass = mrb_alloc_class(super);
+
+  khiter_t key = kh_put(ct, mrb->ct, name, &ret);
+  kh_value(mrb->ct, key) = klass;
+
+  return klass;
+}

@@ -23,6 +23,7 @@ typedef struct mrb_context {
 
 typedef struct mrb_state {
   struct RClass* object_class;
+  struct kh_ct_s *ct;
 
   int exc;
   mrb_callinfo* ci;

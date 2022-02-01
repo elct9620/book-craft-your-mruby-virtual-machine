@@ -6,6 +6,7 @@ extern mrb_state* mrb_open() {
   mrb_state* mrb = (mrb_state*)malloc(sizeof(mrb_state));
 
   *mrb = mrb_state_zero;
+  mrb->ct = kh_init(ct);
   mrb->object_class = mrb_alloc_class(NULL);
 
   return mrb;
@@ -16,6 +17,8 @@ extern void mrb_close(mrb_state* mrb) {
 
   kh_destroy(mt, mrb->object_class->mt);
   free(mrb->object_class);
+
+  kh_destroy(ct, mrb->ct);
   free(mrb);
 }
 
@@ -87,6 +90,21 @@ L_LOADF:
         }
         NEXT;
       }
+      CASE(OP_GETCONST, BB) {
+        const uint8_t* sym = irep_get(bin, IREP_TYPE_SYMBOL, b);
+        int len = PEEK_S(sym);
+        mrb_value const_name = mrb_str_new(sym + 2, len);
+
+        khiter_t key = kh_get(ct, mrb->ct, (char *)const_name.value.p);
+        if(key != kh_end(mrb->ct)) {
+          RClass* klass = kh_value(mrb->ct, key);
+          stack[a] = mrb_class_value(klass);
+        } else {
+          SET_NIL_VALUE(stack[a]);
+        }
+
+        NEXT;
+      }
       CASE(OP_GETUPVAR, BBB) goto L_UPVAR;
       CASE(OP_SETUPVAR, BBB) {
 L_UPVAR:
@@ -124,16 +142,26 @@ L_UPVAR:
         int len = PEEK_S(sym);
         mrb_value method_name = mrb_str_new(sym + 2, len);
 
+        // TODO: Implement find_class method
+        RClass* klass;
+        if(IS_CLASS_VALUE(stack[a])) {
+          klass = (RClass*)stack[a].value.p;
+        } else {
+          klass = mrb->object_class;
+        }
+
         mrb_callinfo ci = { .argc = c, .argv = &stack[a + 1] };
         mrb->ci = &ci;
 
-        khiter_t key = kh_get(mt, mrb->object_class->mt, (char *)method_name.value.p);
-        if(key != kh_end(mrb->object_class->mt)) {
-          mrb_func_t func = kh_value(mrb->object_class->mt, key);
+        khiter_t key = kh_get(mt, klass->mt, (char *)method_name.value.p);
+        if(key != kh_end(klass->mt)) {
+          mrb_func_t func = kh_value(klass->mt, key);
           stack[a] = func(mrb);
         } else if(strcmp("puts", method_name.value.p) == 0) {
 #ifndef UNIT_TEST
-          printf("%s\n", (char *)stack[a + 1].value.p);
+          if(IS_STRING_VALUE(stack[a + 1])) {
+            printf("%s\n", (char *)stack[a + 1].value.p);
+          }
 #endif
           stack[a] = stack[a + 1];
         } else {

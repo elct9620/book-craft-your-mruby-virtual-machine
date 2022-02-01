@@ -24,8 +24,19 @@ typedef struct RObject {
   struct kh_iv_s *iv;
 } RObject;
 
+KHASH_MAP_INIT_STR(ct, RClass*)
+
 extern void mrb_define_method(RClass* klass, const char* name, mrb_func_t func);
 RClass* mrb_alloc_class(RClass* super);
+RClass* mrb_define_class(mrb_state* mrb, const char* name, RClass* super);
+
+static inline mrb_value mrb_class_value(RClass* klass) {
+  mrb_value v;
+
+  SET_CLASS_VALUE(v, klass);
+
+  return v;
+}
 
 #ifdef __cplusplus
 }

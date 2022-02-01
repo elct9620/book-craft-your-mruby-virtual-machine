@@ -22,6 +22,23 @@ extern void mrb_close(mrb_state* mrb) {
   free(mrb);
 }
 
+mrb_func_t mrb_find_method(RClass* klass, const char* method_name) {
+  if(klass == NULL) {
+    return NULL;
+  }
+
+  khiter_t key = kh_get(mt, klass->mt, method_name);
+  if(key != kh_end(klass->mt)) {
+    return kh_value(klass->mt, key);
+  }
+
+  if(klass->super != NULL) {
+    return mrb_find_method(klass->super, method_name);
+  }
+
+  return NULL;
+}
+
 mrb_value mrb_exec(mrb_state* mrb, const uint8_t* bin) {
   const uint8_t* p = bin;
   uint8_t len;
@@ -153,9 +170,8 @@ L_UPVAR:
         mrb_callinfo ci = { .argc = c, .argv = &stack[a + 1] };
         mrb->ci = &ci;
 
-        khiter_t key = kh_get(mt, klass->mt, (char *)method_name.value.p);
-        if(key != kh_end(klass->mt)) {
-          mrb_func_t func = kh_value(klass->mt, key);
+        mrb_func_t func = mrb_find_method(klass, (char *)method_name.value.p);
+        if(func != NULL) {
           stack[a] = func(mrb);
         } else if(strcmp("puts", method_name.value.p) == 0) {
 #ifndef UNIT_TEST

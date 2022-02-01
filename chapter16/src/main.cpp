@@ -52,8 +52,9 @@ int main(int argc, char** argv) {
   mrb_define_method(mrb->object_class, "cputs", c_puts);
   mrb_define_method(mrb->object_class, "loop", c_loop);
 
-  RClass* app = mrb_define_class(mrb, "App", mrb->object_class);
-  mrb_define_method(app, "run", c_run);
+  RClass* base = mrb_define_class(mrb, "Base", mrb->object_class);
+  RClass* app = mrb_define_class(mrb, "App", base);
+  mrb_define_method(base, "run", c_run);
 
   mrb_exec(mrb, bin + 34);
   mrb_close(mrb);

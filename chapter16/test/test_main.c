@@ -6,6 +6,7 @@
 #include "test_condition.h"
 #include "test_loop.h"
 #include "test_method.h"
+#include "test_class.h"
 
 int main() {
   UNITY_BEGIN();
@@ -42,6 +43,10 @@ int main() {
 
   // Methods
   RUN_TEST(test_method_puts);
+
+  // Class
+  RUN_TEST(test_define_class);
+  RUN_TEST(test_define_class_with_parent);
 
   return UNITY_END();
 }

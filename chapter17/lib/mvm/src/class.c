@@ -23,3 +23,11 @@ RClass* mrb_define_class(mrb_state* mrb, const char* name, RClass* super) {
 
   return klass;
 }
+
+RObject* mrb_alloc_object(RClass* klass) {
+  RObject* object = (RObject*)malloc(sizeof(RObject));
+  object->c = klass;
+  object->iv = kh_init(iv);
+
+  return object;
+}

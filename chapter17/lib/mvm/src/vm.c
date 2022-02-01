@@ -1,6 +1,16 @@
 #include<stdio.h>
 #include<mvm.h>
 
+mrb_value mrb_new_object(mrb_state* mrb, mrb_value self) {
+  if(IS_CLASS_VALUE(self)) {
+    RClass* klass = (RClass*)self.value.p;
+    RObject* object = mrb_alloc_object(klass);
+    return mrb_object_value(object);
+  }
+
+  return mrb_nil_value();
+}
+
 extern mrb_state* mrb_open() {
   static const mrb_state mrb_state_zero = { 0 };
   mrb_state* mrb = (mrb_state*)malloc(sizeof(mrb_state));
@@ -8,6 +18,7 @@ extern mrb_state* mrb_open() {
   *mrb = mrb_state_zero;
   mrb->ct = kh_init(ct);
   mrb->object_class = mrb_alloc_class(NULL);
+  mrb_define_method(mrb->object_class, "new", mrb_new_object);
 
   return mrb;
 }
@@ -20,6 +31,18 @@ extern void mrb_close(mrb_state* mrb) {
 
   kh_destroy(ct, mrb->ct);
   free(mrb);
+}
+
+RClass* mrb_find_class(mrb_state* mrb, mrb_value object) {
+  if(IS_CLASS_VALUE(object)) {
+    return (RClass*)object.value.p;
+  }
+
+  if(IS_OBJECT_VALUE(object)) {
+    return ((RObject*)object.value.p)->c;
+  }
+
+  return mrb->object_class;
 }
 
 mrb_func_t mrb_find_method(RClass* klass, const char* method_name) {
@@ -159,20 +182,14 @@ L_UPVAR:
         int len = PEEK_S(sym);
         mrb_value method_name = mrb_str_new(sym + 2, len);
 
-        // TODO: Implement find_class method
-        RClass* klass;
-        if(IS_CLASS_VALUE(stack[a])) {
-          klass = (RClass*)stack[a].value.p;
-        } else {
-          klass = mrb->object_class;
-        }
+        RClass* klass = mrb_find_class(mrb, stack[a]);
 
         mrb_callinfo ci = { .argc = c, .argv = &stack[a + 1] };
         mrb->ci = &ci;
 
         mrb_func_t func = mrb_find_method(klass, (char *)method_name.value.p);
         if(func != NULL) {
-          stack[a] = func(mrb);
+          stack[a] = func(mrb, stack[a]);
         } else if(strcmp("puts", method_name.value.p) == 0) {
 #ifndef UNIT_TEST
           if(IS_STRING_VALUE(stack[a + 1])) {
@@ -192,10 +209,9 @@ L_UPVAR:
         int len = PEEK_S(sym);
         mrb_value method_name = mrb_str_new(sym + 2, len);
 
-        khiter_t key = kh_get(mt, mrb->object_class->mt, (char *)method_name.value.p);
-        if(key != kh_end(mrb->object_class->mt)) {
-          mrb_func_t func = kh_value(mrb->object_class->mt, key);
-
+        RClass* klass = mrb_find_class(mrb, stack[a]);
+        mrb_func_t func = mrb_find_method(klass, (char *)method_name.value.p);
+        if(func != NULL) {
           mrb_value argv[c + 1];
           for(int i = 0; i <= c; i++) {
             argv[i] = stack[a + i + 1];
@@ -206,7 +222,7 @@ L_UPVAR:
           mrb->ci = &ci;
           mrb->ctx = &ctx;
 
-          stack[a] = func(mrb);
+          stack[a] = func(mrb, stack[a]);
         } else {
           SET_NIL_VALUE(stack[a]);
         }

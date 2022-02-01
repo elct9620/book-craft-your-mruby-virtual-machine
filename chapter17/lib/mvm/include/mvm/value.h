@@ -11,6 +11,7 @@ enum mrb_vtype {
   MRB_TYPE_STRING,
   MRB_TYPE_PROC,
   MRB_TYPE_CLASS,
+  MRB_TYPE_OBJECT,
 };
 
 typedef struct mrb_value {
@@ -32,9 +33,11 @@ typedef struct mrb_value {
 #define SET_TRUE_VALUE(r) SET_VALUE(r, MRB_TYPE_TRUE, value.i, 1)
 #define SET_INT_VALUE(r, n) SET_VALUE(r, MRB_TYPE_FIXNUM, value.i, (n))
 #define SET_CLASS_VALUE(r, c) SET_VALUE(r, MRB_TYPE_CLASS, value.p, (c))
+#define SET_OBJECT_VALUE(r, c) SET_VALUE(r, MRB_TYPE_OBJECT, value.p, (c))
 
 #define IS_FALSE_VALUE(r) (r.type == MRB_TYPE_FALSE)
 #define IS_CLASS_VALUE(r) (r.type == MRB_TYPE_CLASS)
+#define IS_OBJECT_VALUE(r) (r.type == MRB_TYPE_OBJECT)
 #define IS_STRING_VALUE(r) (r.type == MRB_TYPE_STRING)
 
 #define mrb_fixnum(o) (o).value.i

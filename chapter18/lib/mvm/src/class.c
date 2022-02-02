@@ -31,3 +31,30 @@ RObject* mrb_alloc_object(RClass* klass) {
 
   return object;
 }
+
+mrb_value mrb_iv_set(mrb_value object, const char* name, mrb_value value) {
+  if(IS_OBJECT_VALUE(object)) {
+    int ret;
+    RObject* obj = (RObject*)object.value.p;
+
+    khiter_t key = kh_put(iv, obj->iv, name, &ret);
+    kh_value(obj->iv, key) = value;
+
+    return value;
+  }
+
+  return mrb_nil_value();
+}
+
+mrb_value mrb_iv_get(mrb_value object, const char* name) {
+  if(IS_OBJECT_VALUE(object)) {
+    RObject* obj = (RObject*)object.value.p;
+
+    khiter_t key = kh_get(iv, obj->iv, name);
+    if(key != kh_end(obj->iv)) {
+      return kh_value(obj->iv, key);
+    }
+  }
+
+  return mrb_nil_value();
+}

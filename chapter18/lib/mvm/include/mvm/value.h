@@ -66,4 +66,8 @@ static inline mrb_value mrb_str_new(const uint8_t* p, int len) {
 
   return v;
 }
+
+static inline mrb_value mrb_str_value(const char* str) {
+  return mrb_str_new((const uint8_t*)str, strlen(str) + 1);
+}
 #endif

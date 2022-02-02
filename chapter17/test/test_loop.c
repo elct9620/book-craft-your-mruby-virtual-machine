@@ -30,7 +30,7 @@ void test_while_loop() {
 /**
  * define loop method
  */
-mrb_value c_loop(mrb_state* mrb) {
+mrb_value c_loop(mrb_state* mrb, mrb_value self) {
   const uint8_t* irep = (const uint8_t*)mrb->ci->argv->value.p;
 
   mrb_value ret;

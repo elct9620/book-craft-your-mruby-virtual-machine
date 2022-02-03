@@ -1,38 +1,6 @@
 #include<stdio.h>
 #include<mvm.h>
 
-mrb_value mrb_new_object(mrb_state* mrb, mrb_value self) {
-  if(IS_CLASS_VALUE(self)) {
-    RClass* klass = (RClass*)self.value.p;
-    RObject* object = mrb_alloc_object(klass);
-    return mrb_object_value(object);
-  }
-
-  return mrb_nil_value();
-}
-
-extern mrb_state* mrb_open() {
-  static const mrb_state mrb_state_zero = { 0 };
-  mrb_state* mrb = (mrb_state*)malloc(sizeof(mrb_state));
-
-  *mrb = mrb_state_zero;
-  mrb->ct = kh_init(ct);
-  mrb->object_class = mrb_alloc_class(NULL);
-  mrb_define_method(mrb->object_class, "new", mrb_new_object);
-
-  return mrb;
-}
-
-extern void mrb_close(mrb_state* mrb) {
-  if(!mrb) return;
-
-  kh_destroy(mt, mrb->object_class->mt);
-  free(mrb->object_class);
-
-  kh_destroy(ct, mrb->ct);
-  free(mrb);
-}
-
 RClass* mrb_find_class(mrb_state* mrb, mrb_value object) {
   if(IS_CLASS_VALUE(object)) {
     return (RClass*)object.value.p;
@@ -60,6 +28,45 @@ mrb_func_t mrb_find_method(RClass* klass, const char* method_name) {
   }
 
   return NULL;
+}
+
+mrb_value mrb_new_object(mrb_state* mrb, mrb_value self) {
+  if(IS_CLASS_VALUE(self)) {
+    RClass* klass = (RClass*)self.value.p;
+    RObject* object = mrb_alloc_object(klass);
+    mrb_value obj = mrb_object_value(object);
+
+    mrb_func_t initialize = mrb_find_method(klass, "initialize");
+    if(initialize != NULL) {
+      initialize(mrb, obj);
+    }
+
+    return obj;
+  }
+
+  return mrb_nil_value();
+}
+
+extern mrb_state* mrb_open() {
+  static const mrb_state mrb_state_zero = { 0 };
+  mrb_state* mrb = (mrb_state*)malloc(sizeof(mrb_state));
+
+  *mrb = mrb_state_zero;
+  mrb->ct = kh_init(ct);
+  mrb->object_class = mrb_alloc_class(NULL);
+  mrb_define_method(mrb->object_class, "new", mrb_new_object);
+
+  return mrb;
+}
+
+extern void mrb_close(mrb_state* mrb) {
+  if(!mrb) return;
+
+  kh_destroy(mt, mrb->object_class->mt);
+  free(mrb->object_class);
+
+  kh_destroy(ct, mrb->ct);
+  free(mrb);
 }
 
 mrb_value mrb_exec(mrb_state* mrb, const uint8_t* bin) {

@@ -48,8 +48,10 @@ int main() {
   RUN_TEST(test_define_class);
   RUN_TEST(test_define_class_with_parent);
   RUN_TEST(test_new_object);
+  RUN_TEST(test_new_object_with_arguments);
   RUN_TEST(test_object_call_method);
   RUN_TEST(test_object_call_parent_method);
+  RUN_TEST(test_object_instance_variable);
 
   return UNITY_END();
 }

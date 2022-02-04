@@ -140,9 +140,10 @@ L_LOADF:
       CASE(OP_GETCONST, BB) {
         const uint8_t* sym = irep_get(bin, IREP_TYPE_SYMBOL, b);
         int len = PEEK_S(sym);
-        mrb_value const_name = mrb_str_new(sym + 2, len);
+        char const_name[len + 1];
+        memcpy(const_name, sym + 2, len + 1);
 
-        khiter_t key = kh_get(ct, mrb->ct, (char *)const_name.value.p);
+        khiter_t key = kh_get(ct, mrb->ct, const_name);
         if(key != kh_end(mrb->ct)) {
           RClass* klass = kh_value(mrb->ct, key);
           stack[a] = mrb_class_value(klass);
@@ -187,17 +188,18 @@ L_UPVAR:
       CASE(OP_SEND, BBB) {
         const uint8_t* sym = irep_get(bin, IREP_TYPE_SYMBOL, b);
         int len = PEEK_S(sym);
-        mrb_value method_name = mrb_str_new(sym + 2, len);
+        char method_name[len + 1];
+        memcpy(method_name, sym + 2, len + 1);
 
         RClass* klass = mrb_find_class(mrb, stack[a]);
 
         mrb_callinfo ci = { .argc = c, .argv = &stack[a + 1] };
         mrb->ci = &ci;
 
-        mrb_func_t func = mrb_find_method(klass, (char *)method_name.value.p);
+        mrb_func_t func = mrb_find_method(klass, method_name);
         if(func != NULL) {
           stack[a] = func(mrb, stack[a]);
-        } else if(strcmp("puts", method_name.value.p) == 0) {
+        } else if(strcmp("puts", method_name) == 0) {
 #ifndef UNIT_TEST
           if(IS_STRING_VALUE(stack[a + 1])) {
             printf("%s\n", (char *)stack[a + 1].value.p);
@@ -208,16 +210,16 @@ L_UPVAR:
           SET_NIL_VALUE(stack[a]);
         }
 
-        free(method_name.value.p);
         NEXT;
       }
       CASE(OP_SENDB, BBB) {
         const uint8_t* sym = irep_get(bin, IREP_TYPE_SYMBOL, b);
         int len = PEEK_S(sym);
-        mrb_value method_name = mrb_str_new(sym + 2, len);
+        char method_name[len + 1];
+        memcpy(method_name, sym + 2, len + 1);
 
         RClass* klass = mrb_find_class(mrb, stack[a]);
-        mrb_func_t func = mrb_find_method(klass, (char *)method_name.value.p);
+        mrb_func_t func = mrb_find_method(klass, method_name);
         if(func != NULL) {
           mrb_value argv[c + 1];
           for(int i = 0; i <= c; i++) {
@@ -235,7 +237,6 @@ L_UPVAR:
         }
 
         mrb->ctx = NULL;
-        free(method_name.value.p);
 
         NEXT;
       }
@@ -244,6 +245,7 @@ L_UPVAR:
         NEXT;
       }
       CASE(OP_RETURN, B) {
+        free(irep);
         return stack[a];
       }
       CASE(OP_BREAK, B) {
@@ -333,6 +335,8 @@ L_UPVAR:
       }
     }
   }
+
+  free(irep);
 
   return mrb_nil_value();
 }

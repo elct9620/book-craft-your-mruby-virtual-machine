@@ -1,0 +1,7 @@
+{
+  "name": "klib",
+  "build": {
+    "srcFilter": "-<test/> -<lua/>",
+    "libArchive": false
+  }
+}

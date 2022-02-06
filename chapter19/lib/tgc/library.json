@@ -1,7 +1,7 @@
 {
   "name": "tgc",
   "build": {
-    "srcFilter": "-<examples/>",
+    "srcFilter": ["-<examples/>", "+<*.c>"],
     "libArchive": false
   }
 }

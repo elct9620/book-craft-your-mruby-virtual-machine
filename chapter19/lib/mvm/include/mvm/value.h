@@ -39,6 +39,7 @@ typedef struct mrb_value {
 #define IS_CLASS_VALUE(r) (r.type == MRB_TYPE_CLASS)
 #define IS_OBJECT_VALUE(r) (r.type == MRB_TYPE_OBJECT)
 #define IS_STRING_VALUE(r) (r.type == MRB_TYPE_STRING)
+#define IS_FIXNUM_VALUE(r) (r.type == MRB_TYPE_FIXNUM)
 
 #define mrb_fixnum(o) (o).value.i
 #define mrb_int(o) mrb_fixnum(o)
@@ -53,21 +54,5 @@ static inline mrb_value mrb_fixnum_value(int i) {
   mrb_value v;
   SET_INT_VALUE(v, i);
   return v;
-}
-
-static inline mrb_value mrb_str_new(const uint8_t* p, int len) {
-  mrb_value v;
-
-  char* str = (char*)malloc(len + 1);
-  memcpy(str, p, len);
-
-  v.type = MRB_TYPE_STRING;
-  v.value.p = (void*)str;
-
-  return v;
-}
-
-static inline mrb_value mrb_str_value(const char* str) {
-  return mrb_str_new((const uint8_t*)str, strlen(str) + 1);
 }
 #endif

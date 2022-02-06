@@ -14,7 +14,7 @@ void test_method_puts() {
 
   mrb_state* mrb = mrb_open();
   mrb_value ret = mrb_exec(mrb, bin + 34);
-  mrb_close(mrb);
-
   TEST_ASSERT_EQUAL_STRING("Hello World", ret.value.p);
+
+  mrb_close(mrb);
 }

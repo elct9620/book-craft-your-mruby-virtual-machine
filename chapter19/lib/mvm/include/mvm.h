@@ -6,5 +6,6 @@
 #include "mvm/irep.h"
 #include "mvm/class.h"
 #include "mvm/vm.h"
+#include "mvm/string.h"
 
 #endif

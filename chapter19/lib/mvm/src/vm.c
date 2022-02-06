@@ -33,7 +33,7 @@ mrb_func_t mrb_find_method(RClass* klass, const char* method_name) {
 mrb_value mrb_new_object(mrb_state* mrb, mrb_value self) {
   if(IS_CLASS_VALUE(self)) {
     RClass* klass = (RClass*)self.value.p;
-    RObject* object = mrb_alloc_object(klass);
+    RObject* object = mrb_alloc_object(mrb, klass);
     mrb_value obj = mrb_object_value(object);
 
     mrb_func_t initialize = mrb_find_method(klass, "initialize");
@@ -53,7 +53,11 @@ extern mrb_state* mrb_open() {
 
   *mrb = mrb_state_zero;
   mrb->ct = kh_init(ct);
-  mrb->object_class = mrb_alloc_class(NULL);
+
+  void* stack = NULL;
+  tgc_start(&mrb->gc, (void*)&stack);
+
+  mrb->object_class = mrb_alloc_class(mrb, NULL);
   mrb_define_method(mrb->object_class, "new", mrb_new_object);
 
   return mrb;
@@ -62,10 +66,9 @@ extern mrb_state* mrb_open() {
 extern void mrb_close(mrb_state* mrb) {
   if(!mrb) return;
 
-  kh_destroy(mt, mrb->object_class->mt);
-  free(mrb->object_class);
-
   kh_destroy(ct, mrb->ct);
+
+  tgc_stop(&mrb->gc);
   free(mrb);
 }
 
@@ -204,6 +207,10 @@ L_UPVAR:
           if(IS_STRING_VALUE(stack[a + 1])) {
             printf("%s\n", (char *)stack[a + 1].value.p);
           }
+
+          if(IS_FIXNUM_VALUE(stack[a + 1])) {
+            printf("%d\n", stack[a + 1].value.i);
+          }
 #endif
           stack[a] = stack[a + 1];
         } else {
@@ -322,7 +329,7 @@ L_UPVAR:
         int len = PEEK_S(lit);
         lit += 2;
 
-        stack[a] = mrb_str_new(lit, len);
+        stack[a] = mrb_str_new(mrb, lit, len);
 
         NEXT;
       }

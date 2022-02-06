@@ -1,4 +1,5 @@
 #include<mvm.h>
+#include<tgc.h>
 
 void mrb_define_method(RClass* klass, const char* name, mrb_func_t func) {
   int ret;
@@ -6,8 +7,13 @@ void mrb_define_method(RClass* klass, const char* name, mrb_func_t func) {
   kh_value(klass->mt, key) = func;
 }
 
-RClass* mrb_alloc_class(RClass* super) {
-  RClass* klass = (RClass*)malloc(sizeof(RClass));
+void mrb_free_class(void* ptr) {
+  RClass* klass = (RClass*)ptr;
+  kh_destroy(mt, klass->mt);
+}
+
+RClass* mrb_alloc_class(mrb_state* mrb, RClass* super) {
+  RClass* klass = (RClass*)tgc_alloc_opt(&mrb->gc, sizeof(RClass), 0, mrb_free_class);
   klass->super = super;
   klass->mt = kh_init(mt);
 
@@ -16,7 +22,7 @@ RClass* mrb_alloc_class(RClass* super) {
 
 RClass* mrb_define_class(mrb_state* mrb, const char* name, RClass* super) {
   int ret;
-  RClass* klass = mrb_alloc_class(super);
+  RClass* klass = mrb_alloc_class(mrb, super);
 
   khiter_t key = kh_put(ct, mrb->ct, name, &ret);
   kh_value(mrb->ct, key) = klass;
@@ -24,8 +30,13 @@ RClass* mrb_define_class(mrb_state* mrb, const char* name, RClass* super) {
   return klass;
 }
 
-RObject* mrb_alloc_object(RClass* klass) {
-  RObject* object = (RObject*)malloc(sizeof(RObject));
+void mrb_free_object(void* ptr) {
+  RObject* object = (RObject*)ptr;
+  kh_destroy(iv, object->iv);
+}
+
+RObject* mrb_alloc_object(mrb_state* mrb, RClass* klass) {
+  RObject* object = (RObject*)tgc_alloc_opt(&mrb->gc, sizeof(RObject), 0, mrb_free_object);
   object->c = klass;
   object->iv = kh_init(iv);
 

@@ -1,6 +1,8 @@
 #ifndef MVM_VM_H
 #define MVM_VM_H
 
+#include<tgc.h>
+
 #include "mvm/irep.h"
 #include "mvm/value.h"
 #include "mvm/class.h"
@@ -28,6 +30,8 @@ typedef struct mrb_state {
   int exc;
   mrb_callinfo* ci;
   mrb_context* ctx;
+
+  tgc_t gc;
 } mrb_state;
 
 extern mrb_state* mrb_open();

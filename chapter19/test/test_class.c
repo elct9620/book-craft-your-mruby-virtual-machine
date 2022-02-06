@@ -6,7 +6,7 @@
  */
 mrb_value c_run(mrb_state* mrb, mrb_value self) {
   const char* str = "Hello World";
-  return mrb_str_new((const uint8_t*)str, 12);
+  return mrb_str_new(mrb, (const uint8_t*)str, 12);
 }
 
 /**
@@ -33,7 +33,7 @@ mrb_value point_to_string(mrb_state* mrb, mrb_value self) {
   mrb_value y = mrb_iv_get(self, "@y");
 
   sprintf(buffer, "#<Point x=%d, y=%d>", mrb_fixnum(x), mrb_fixnum(y));
-  return mrb_str_value(buffer);
+  return mrb_str_value(mrb, buffer);
 }
 
 void test_define_class() {
@@ -52,9 +52,9 @@ void test_define_class() {
   mrb_define_method(app, "run", c_run);
 
   mrb_value ret = mrb_exec(mrb, bin + 34);
-  mrb_close(mrb);
-
   TEST_ASSERT_EQUAL_STRING("Hello World", ret.value.p);
+
+  mrb_close(mrb);
 }
 
 void test_define_class_with_parent() {
@@ -75,9 +75,9 @@ void test_define_class_with_parent() {
   RClass* app = mrb_define_class(mrb, "App", base);
 
   mrb_value ret = mrb_exec(mrb, bin + 34);
-  mrb_close(mrb);
-
   TEST_ASSERT_EQUAL_STRING("Hello World", ret.value.p);
+
+  mrb_close(mrb);
 }
 
 void test_new_object() {
@@ -95,10 +95,10 @@ void test_new_object() {
   RClass* app = mrb_define_class(mrb, "App", mrb->object_class);
 
   mrb_value ret = mrb_exec(mrb, bin + 34);
-  mrb_close(mrb);
-
   TEST_ASSERT_EQUAL_INT(MRB_TYPE_OBJECT, ret.type);
   TEST_ASSERT_EQUAL_INT(app, ((RObject*)ret.value.p)->c);
+
+  mrb_close(mrb);
 }
 
 void test_new_object_with_arguments() {
@@ -122,9 +122,9 @@ void test_new_object_with_arguments() {
   mrb_define_method(point, "to_s", point_to_string);
 
   mrb_value ret = mrb_exec(mrb, bin + 34);
-  mrb_close(mrb);
-
   TEST_ASSERT_EQUAL_STRING("#<Point x=1, y=1>", ret.value.p);
+
+  mrb_close(mrb);
 }
 
 void test_object_call_method() {
@@ -146,9 +146,9 @@ void test_object_call_method() {
   mrb_define_method(app, "run", c_run);
 
   mrb_value ret = mrb_exec(mrb, bin + 34);
-  mrb_close(mrb);
-
   TEST_ASSERT_EQUAL_STRING("Hello World", ret.value.p);
+
+  mrb_close(mrb);
 };
 
 void test_object_call_parent_method() {
@@ -172,9 +172,9 @@ void test_object_call_parent_method() {
   RClass* app = mrb_define_class(mrb, "App", base);
 
   mrb_value ret = mrb_exec(mrb, bin + 34);
-  mrb_close(mrb);
-
   TEST_ASSERT_EQUAL_STRING("Hello World", ret.value.p);
+
+  mrb_close(mrb);
 };
 
 void test_object_instance_variable() {
@@ -202,7 +202,7 @@ void test_object_instance_variable() {
   mrb_define_method(point, "to_s", point_to_string);
 
   mrb_value ret = mrb_exec(mrb, bin + 34);
-  mrb_close(mrb);
-
   TEST_ASSERT_EQUAL_STRING("#<Point x=1, y=1>", ret.value.p);
+
+  mrb_close(mrb);
 }

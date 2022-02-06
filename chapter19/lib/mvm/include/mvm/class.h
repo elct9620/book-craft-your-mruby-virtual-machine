@@ -27,9 +27,9 @@ typedef struct RObject {
 KHASH_MAP_INIT_STR(ct, RClass*)
 
 extern void mrb_define_method(RClass* klass, const char* name, mrb_func_t func);
-RClass* mrb_alloc_class(RClass* super);
+RClass* mrb_alloc_class(mrb_state* mrb, RClass* super);
 extern RClass* mrb_define_class(mrb_state* mrb, const char* name, RClass* super);
-RObject* mrb_alloc_object(RClass* klass);
+RObject* mrb_alloc_object(mrb_state* mrb, RClass* klass);
 extern mrb_value mrb_iv_set(mrb_value object, const char* name, mrb_value value);
 extern mrb_value mrb_iv_get(mrb_value object, const char* name);
 

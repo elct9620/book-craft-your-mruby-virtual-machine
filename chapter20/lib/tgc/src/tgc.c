@@ -23,20 +23,20 @@ static tgc_ptr_t *tgc_get_ptr(tgc_t *gc, void *ptr) {
 }
 
 static void tgc_add_ptr(
-  tgc_t *gc, void *ptr, size_t size, 
+  tgc_t *gc, void *ptr, size_t size,
   int flags, void(*dtor)(void*)) {
 
   tgc_ptr_t item, tmp;
   size_t h, p, i, j;
 
   i = tgc_hash(ptr) % gc->nslots; j = 0;
-  
+
   item.ptr = ptr;
   item.flags = flags;
   item.size = size;
   item.hash = i+1;
   item.dtor = dtor;
-  
+
   while (1) {
     h = gc->items[i].hash;
     if (h == 0) { gc->items[i] = item; return; }
@@ -50,7 +50,7 @@ static void tgc_add_ptr(
     }
     i = (i+1) % gc->nslots; j++;
   }
-  
+
 }
 
 static void tgc_rem_ptr(tgc_t *gc, void *ptr) {
@@ -58,20 +58,20 @@ static void tgc_rem_ptr(tgc_t *gc, void *ptr) {
   size_t i, j, h, nj, nh;
 
   if (gc->nitems == 0) { return; }
-  
+
   for (i = 0; i < gc->nfrees; i++) {
     if (gc->frees[i].ptr == ptr) { gc->frees[i].ptr = NULL; }
   }
-  
+
   i = tgc_hash(ptr) % gc->nslots; j = 0;
-  
+
   while (1) {
     h = gc->items[i].hash;
     if (h == 0 || j > tgc_probe(gc, i, h)) { return; }
     if (gc->items[i].ptr == ptr) {
       memset(&gc->items[i], 0, sizeof(tgc_ptr_t));
       j = i;
-      while (1) { 
+      while (1) {
         nj = (j+1) % gc->nslots;
         nh = gc->items[nj].hash;
         if (nh != 0 && tgc_probe(gc, nj, nh) > 0) {
@@ -80,14 +80,14 @@ static void tgc_rem_ptr(tgc_t *gc, void *ptr) {
           j = nj;
         } else {
           break;
-        }  
+        }
       }
       gc->nitems--;
       return;
     }
     i = (i+1) % gc->nslots; j++;
   }
-  
+
 }
 
 
@@ -122,37 +122,37 @@ static int tgc_rehash(tgc_t* gc, size_t new_size) {
   size_t i;
   tgc_ptr_t *old_items = gc->items;
   size_t old_size = gc->nslots;
-  
+
   gc->nslots = new_size;
   gc->items = calloc(gc->nslots, sizeof(tgc_ptr_t));
-  
+
   if (gc->items == NULL) {
     gc->nslots = old_size;
     gc->items = old_items;
     return 0;
   }
-  
+
   for (i = 0; i < old_size; i++) {
     if (old_items[i].hash != 0) {
-      tgc_add_ptr(gc, 
-        old_items[i].ptr,   old_items[i].size, 
+      tgc_add_ptr(gc,
+        old_items[i].ptr,   old_items[i].size,
         old_items[i].flags, old_items[i].dtor);
     }
   }
-  
+
   free(old_items);
-  
+
   return 1;
 }
 
 static int tgc_resize_more(tgc_t *gc) {
-  size_t new_size = tgc_ideal_size(gc, gc->nitems);  
+  size_t new_size = tgc_ideal_size(gc, gc->nitems);
   size_t old_size = gc->nslots;
   return (new_size > old_size) ? tgc_rehash(gc, new_size) : 1;
 }
 
 static int tgc_resize_less(tgc_t *gc) {
-  size_t new_size = tgc_ideal_size(gc, gc->nitems);  
+  size_t new_size = tgc_ideal_size(gc, gc->nitems);
   size_t old_size = gc->nslots;
   return (new_size < old_size) ? tgc_rehash(gc, new_size) : 1;
 }
@@ -160,12 +160,12 @@ static int tgc_resize_less(tgc_t *gc) {
 static void tgc_mark_ptr(tgc_t *gc, void *ptr) {
 
   size_t i, j, h, k;
-  
-  if ((uintptr_t)ptr < gc->minptr 
+
+  if ((uintptr_t)ptr < gc->minptr
   ||  (uintptr_t)ptr > gc->maxptr) { return; }
-  
+
   i = tgc_hash(ptr) % gc->nslots; j = 0;
-  
+
   while (1) {
     h = gc->items[i].hash;
     if (h == 0 || j > tgc_probe(gc, i, h)) { return; }
@@ -180,38 +180,38 @@ static void tgc_mark_ptr(tgc_t *gc, void *ptr) {
     }
     i = (i+1) % gc->nslots; j++;
   }
-  
+
 }
 
 static void tgc_mark_stack(tgc_t *gc) {
-  
+
   void *stk, *bot, *top, *p;
   bot = gc->bottom; top = &stk;
-  
+
   if (bot == top) { return; }
-  
+
   if (bot < top) {
     for (p = top; p >= bot; p = ((char*)p) - sizeof(void*)) {
       tgc_mark_ptr(gc, *((void**)p));
     }
   }
-  
+
   if (bot > top) {
     for (p = top; p <= bot; p = ((char*)p) + sizeof(void*)) {
       tgc_mark_ptr(gc, *((void**)p));
     }
   }
-  
+
 }
 
 static void tgc_mark(tgc_t *gc) {
-  
+
   size_t i, k;
   jmp_buf env;
   void (*volatile mark_stack)(tgc_t*) = tgc_mark_stack;
-  
+
   if (gc->nitems == 0) { return; }
-  
+
   for (i = 0; i < gc->nslots; i++) {
     if (gc->items[i].hash ==        0) { continue; }
     if (gc->items[i].flags & TGC_MARK) { continue; }
@@ -224,7 +224,7 @@ static void tgc_mark(tgc_t *gc) {
       continue;
     }
   }
-  
+
   memset(&env, 0, sizeof(jmp_buf));
   setjmp(env);
   mark_stack(gc);
@@ -232,11 +232,11 @@ static void tgc_mark(tgc_t *gc) {
 }
 
 void tgc_sweep(tgc_t *gc) {
-  
+
   size_t i, j, k, nj, nh;
-  
+
   if (gc->nitems == 0) { return; }
-  
+
   gc->nfrees = 0;
   for (i = 0; i < gc->nslots; i++) {
     if (gc->items[i].hash ==        0) { continue; }
@@ -246,19 +246,22 @@ void tgc_sweep(tgc_t *gc) {
   }
 
   gc->frees = realloc(gc->frees, sizeof(tgc_ptr_t) * gc->nfrees);
-  if (gc->frees == NULL) { return; }
-  
+  /**
+   * Force sweep in ESP8266
+   */
+  // if (gc->frees == NULL) { return; }
+
   i = 0; k = 0;
   while (i < gc->nslots) {
     if (gc->items[i].hash ==        0) { i++; continue; }
     if (gc->items[i].flags & TGC_MARK) { i++; continue; }
     if (gc->items[i].flags & TGC_ROOT) { i++; continue; }
-    
+
     gc->frees[k] = gc->items[i]; k++;
     memset(&gc->items[i], 0, sizeof(tgc_ptr_t));
-    
+
     j = i;
-    while (1) { 
+    while (1) {
       nj = (j+1) % gc->nslots;
       nh = gc->items[nj].hash;
       if (nh != 0 && tgc_probe(gc, nj, nh) > 0) {
@@ -267,33 +270,33 @@ void tgc_sweep(tgc_t *gc) {
         j = nj;
       } else {
         break;
-      }  
+      }
     }
     gc->nitems--;
   }
-  
+
   for (i = 0; i < gc->nslots; i++) {
     if (gc->items[i].hash == 0) { continue; }
     if (gc->items[i].flags & TGC_MARK) {
       gc->items[i].flags &= ~TGC_MARK;
     }
   }
-  
+
   tgc_resize_less(gc);
-  
+
   gc->mitems = gc->nitems + (size_t)(gc->nitems * gc->sweepfactor) + 1;
-  
+
   for (i = 0; i < gc->nfrees; i++) {
     if (gc->frees[i].ptr) {
       if (gc->frees[i].dtor) { gc->frees[i].dtor(gc->frees[i].ptr); }
       free(gc->frees[i].ptr);
     }
   }
-  
+
   free(gc->frees);
   gc->frees = NULL;
   gc->nfrees = 0;
-  
+
 }
 
 void tgc_start(tgc_t *gc, void *stk) {
@@ -331,13 +334,13 @@ void tgc_run(tgc_t *gc) {
 }
 
 static void *tgc_add(
-  tgc_t *gc, void *ptr, size_t size, 
+  tgc_t *gc, void *ptr, size_t size,
   int flags, void(*dtor)(void*)) {
 
   gc->nitems++;
-  gc->maxptr = ((uintptr_t)ptr) + size > gc->maxptr ? 
-    ((uintptr_t)ptr) + size : gc->maxptr; 
-  gc->minptr = ((uintptr_t)ptr)        < gc->minptr ? 
+  gc->maxptr = ((uintptr_t)ptr) + size > gc->maxptr ?
+    ((uintptr_t)ptr) + size : gc->maxptr;
+  gc->minptr = ((uintptr_t)ptr)        < gc->minptr ?
     ((uintptr_t)ptr)        : gc->minptr;
 
   if (tgc_resize_more(gc)) {
@@ -368,10 +371,10 @@ void *tgc_calloc(tgc_t *gc, size_t num, size_t size) {
 }
 
 void *tgc_realloc(tgc_t *gc, void *ptr, size_t size) {
-  
+
   tgc_ptr_t *p;
   void *qtr = realloc(ptr, size);
-  
+
   if (qtr == NULL) {
     tgc_rem(gc, ptr);
     return qtr;
@@ -420,7 +423,7 @@ void *tgc_alloc_opt(tgc_t *gc, size_t size, int flags, void(*dtor)(void*)) {
 }
 
 void *tgc_calloc_opt(
-  tgc_t *gc, size_t num, size_t size, 
+  tgc_t *gc, size_t num, size_t size,
   int flags, void(*dtor)(void*)) {
   void *ptr = calloc(num, size);
   if (ptr != NULL) {

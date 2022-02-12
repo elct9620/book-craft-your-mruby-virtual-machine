@@ -121,6 +121,10 @@ LOAD_I:
         SET_INT_VALUE(stack[a], insn - OP_LOADI_0);
         NEXT;
       }
+      CASE(OP_LOADI16, BS) {
+        SET_INT_VALUE(stack[a], (int16_t)b);
+        NEXT;
+      }
       CASE(OP_LOADNIL, B) {
         stack[a] = mrb_nil_value();
         NEXT;
@@ -329,7 +333,7 @@ L_UPVAR:
         int len = PEEK_S(lit);
         lit += 2;
 
-        stack[a] = mrb_str_new(mrb, lit, len);
+        stack[a] = mrb_str_new(mrb, lit, len + 1);
 
         NEXT;
       }

@@ -31,6 +31,25 @@ mrb_value mrb_sleep(mrb_state* mrb, mrb_value self) {
   return self;
 }
 
+mrb_value screen_init(mrb_state* mrb, mrb_value self) {
+  hal_screen_init();
+  return self;
+}
+
+mrb_value screen_clear(mrb_state* mrb, mrb_value self) {
+  hal_screen_clear();
+  return self;
+};
+
+mrb_value screen_print(mrb_state* mrb, mrb_value self) {
+  mrb_value text = mrb->ci->argv[0];
+  mrb_value x = mrb->ci->argv[1];
+  mrb_value y = mrb->ci->argv[1];
+
+  hal_screen_print((char *)text.value.p, mrb_fixnum(x), mrb_fixnum(y));
+  return self;
+};
+
 void initialize_app(mrb_state* mrb) {
   mrb_define_method(mrb->object_class, "sleep", mrb_sleep);
 
@@ -39,4 +58,9 @@ void initialize_app(mrb_state* mrb) {
   mrb_define_method(point, "x", point_get_x);
   mrb_define_method(point, "x=", point_set_x);
   mrb_define_method(point, "to_s", point_to_string);
+
+  RClass* screen = mrb_define_class(mrb, "Screen", mrb->object_class);
+  mrb_define_method(screen, "init", screen_init);
+  mrb_define_method(screen, "clear", screen_clear);
+  mrb_define_method(screen, "print", screen_print);
 }

@@ -69,6 +69,7 @@ enum {
   OP_GE,
   OP_STRING = 79,
   OP_BLOCK = 85,
+  OP_LOADI16 = 104
 };
 
 #endif

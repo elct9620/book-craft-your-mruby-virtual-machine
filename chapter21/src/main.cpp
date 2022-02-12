@@ -25,6 +25,5 @@ void setup() {
 
 void loop() {
   mrb_exec(mrb, bin + 34);
-  delay(500);
 }
 #endif

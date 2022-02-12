@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
-i = 0
-while i < 100
-  point = Point.new(i, 0)
-  puts point.to_s
-  sleep 10
-  i += 1
+Screen.init
+
+while true
+  Screen.clear
+  Screen.print 'Hello World', 10, 10
+
+  sleep 500
 end

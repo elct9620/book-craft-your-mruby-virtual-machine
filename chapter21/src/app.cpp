@@ -44,7 +44,7 @@ mrb_value screen_clear(mrb_state* mrb, mrb_value self) {
 mrb_value screen_print(mrb_state* mrb, mrb_value self) {
   mrb_value text = mrb->ci->argv[0];
   mrb_value x = mrb->ci->argv[1];
-  mrb_value y = mrb->ci->argv[1];
+  mrb_value y = mrb->ci->argv[2];
 
   hal_screen_print((char *)text.value.p, mrb_fixnum(x), mrb_fixnum(y));
   return self;
